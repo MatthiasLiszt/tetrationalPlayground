@@ -1,0 +1,79 @@
+<html>
+<body>
+<h1>Approximation of Tetration with 25 coefficients </h1>
+<h3>by a Taylor series and by the linear approximation </h3>
+<h5><i>probably the Kneser solution</i></h5>
+
+<p>The linear approximation is e<sup>x</sup> below e and 
+   e<sup>e<sup>x</sup></sup> between e and e<sup>2</sup>.
+</p>
+<script>
+    // this is probably the Kneser solution
+    c0 = 1;
+    c1 = 1.091767351258322138;
+    c2 = 0.271483212901696469;
+    c3 = 0.212453248176258214;
+    c4 = 0.069540376139988952;
+    c5 = 0.044291952090474256;
+    c6 = 0.014736742096390039;
+    c7 = 0.008668781817225539;
+    c8 = 0.002796479398385586;
+    c9 = 0.001610631290584341;
+    c10= 0.000489927231484419;
+    c11= 0.000288181071154065;
+    c12= 0.000080094612538551;
+    c13= 0.000050291141793809;
+    c14= 0.000012183790344901;
+    c15= 0.000008665533667382;
+    c16= 0.000001687782319318;
+    c17= 0.000001493253248573;
+    c18= 0.000000198760764204;
+    c19= 0.000000260867356004;
+    c20= 0.000000014709954143;
+    c21= 0.000000046834497327;
+    c22=-0.000000001549241666;
+    c23= 0.000000008741510781;
+    c24=-0.000000001125787310;
+    c25= 0.000000001707959267;
+    
+    resultsTaylor = [];
+    resultsLinear = [];
+    
+    function calcTetration(z) {
+      T1 = c0 + c1 * z + c2 * z * z + c3 * (z ** 3) + c4 * (z ** 4);
+      T2 = c5 * (z ** 5) + c6 * (z ** 6) + c7 * (z ** 7) + c8 * (z ** 8);
+      T3 = c9 * (z ** 9) + c10 * (z ** 10) + c11 * (z ** 11) + c12 * (z ** 12);
+      T4 = c13 * (z ** 13) + c14 * (z ** 14) + c15 * (z ** 15) + c16 * (z ** 16);
+      T5 = c17 * (z ** 17) + c18 * (z ** 18) + c19 * (z ** 19) + c20 * (z ** 20);
+      T6 = c21 * (z ** 21) + c22 * (z ** 22) + c23 * (z ** 23) + c24 * (z ** 24);
+      T = T1 + T2 + T3 + T4 + T5 + T6 + c25 * (z ** 25);	
+      return T;
+    }
+	
+    E = Math.E;
+    	
+    console.log('check');	
+    document.write(`<p>e<sup>0.125</sup> ${E**0.125} ${calcTetration(0.125)} d ${Math.abs(Math.floor( (calcTetration(0.125)-E**0.125) *100 ))}%</p>`);
+    document.write(`<p>e<sup>0.5</sup> ${E**0.5} ${calcTetration(0.5)} d ${Math.abs(Math.floor( (calcTetration(0.5)-E**0.5) *100 ))}%</p>`);
+    document.write(`<p>e<sup>0.75</sup> ${E**0.75} ${calcTetration(0.75)} d ${Math.abs(Math.floor( (calcTetration(0.75)-E**0.75)*100 ))}%</p>`);
+    document.write(`<p>e<sup>0.9</sup> ${E**0.9} ${calcTetration(0.9)} d ${Math.abs(Math.floor( (calcTetration(0.9)-E**0.9)*100 ))}%</p>`);
+    document.write(`<p>e ${E} ${calcTetration(1)} d ${Math.abs(Math.floor( (calcTetration(1)-E) * 100 ) )}%</p>`);                
+    document.write(`<p>e<sup>1.25</sup> ${E**E**0.25} ${calcTetration(1.25)} d ${Math.abs(Math.floor((calcTetration(1.25)-E**E**0.25)*100))}%</p>`);
+    document.write('<hr/>');
+    fixpoint = 1.85035452902718;
+    d = Math.floor(Math.abs(E**E**(fixpoint - 1) - calcTetration(fixpoint))*100)/100;
+    document.write(`<p>said fixpoint <sup>${fixpoint}</sup>e ${E**E**(fixpoint - 1)} ${calcTetration(fixpoint)} d ${d} or ${d*100} %</p>`);
+    console.log('end');
+</script>
+<script>
+   /* 
+   let i = 0; 
+   for(let one of resultsTaylor){
+      difference = one - resultsLinear[i];
+      document.write(`<p> <strong>${Math.log(resultsLinear[i])}</strong> ${resultsLinear[i]} ${one} ${difference}</p>`);
+      ++i;        
+   }
+   */
+</script>
+</body>
+</html>

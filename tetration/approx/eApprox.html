@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h1>approximating the exponential function with two polynominals</h1>
+<script> 
+   
+  E = Math.E;
+   
+  max = 1;	
+  best = 0;
+  bestQuality = 0;
+  bestP1 = 0;
+  bestP2 = 0;
+  bestP3 = 0;
+  c1 = 0;
+  c2 = 0;
+  c3 = 0;
+  c4 = 0;
+  C = 0;
+  point1 = 1;
+  point2 = 2;
+  point3 = E;
+    
+  testvalues = [0.1, 0.5, 1, 1.1, 1.5, 2, E, 3];
+  
+  for (let q = 0;q < 1e4; q+=1) {
+    score = 0;	
+    constant = 1;
+    check1 = Math.floor(q/100);
+    check2 = q%100;
+    
+    check1 *= 0.01;
+    check2 *= 0.01;
+        
+    for (let t of testvalues){
+	  sum = constant + t*check1 + check2 * t**2;
+	  score = E**t > 0.9 * sum && E**t < 1.1 * sum ? ++score : score;
+	  score = E**t > 0.5 * sum && E**t < 2 * sum ? score += 0.01 : score; 
+	}
+    
+    // needs to be pass through at least 3 points to be a curve
+    p = point1;
+    sum1 = constant + p*check1 + check2*p*p;
+    p = point2;
+    sum2 = constant + p*check1 + check2*p*p;
+    p = point3;
+    sum3 = constant + p*check1 + check2*p*p;
+    around = 0.5;
+    p1 = sum1 > ((E**point1)*around) && sum1 < ((E**point1)*(1/around));
+    p2 = sum2 > ((E**point2)*around) && sum2 < ((E**point2)*(1/around));
+    p3 = sum3 > ((E**point3)*around) && sum3 < ((E**point3)*(1/around));
+    quality1 = E**point1 > sum1 ? sum1/(E**point1) : (E**point1)/sum1;
+    quality2 = E**point2 > sum2 ? sum2/(E**point2) : (E**point2)/sum2;
+    quality3 = E**point3 > sum3 ? sum3/(E**point3) : (E**point3)/sum3;
+    quality = (quality1 + quality2 + quality3) / 3;
+    if (p1 && p2 && quality > bestQuality) {
+      c1 = quality > bestQuality ? check1 : c1;
+      c2 = quality > bestQuality ? check2 : c2;
+      C = score > best ? constant : C;
+      best = score > best ? score : best;  
+      bestQuality = quality;
+      bestP1 = sum1;
+      bestP2 = sum2;
+      bestP3 = sum3;
+    }  
+  }
+  formula = `${C} + ${c1}x + ${c2}x<sup>2</sup> + ${c3}x<sup>3</sup> + ${c4}x<sup>4</sup>`;
+  score = Math.floor(score*1e4)/1e4;
+  bestQuality = Math.floor(bestQuality*1e4)/1e2;
+  document.write(`${formula} best match of points ${bestQuality} % score ${score}`);
+  document.write(`<p>curve matching points where set to e<sup>${point1}</sup> , e<sup>${point2}</sup> and e<sup>${point3}</sup></p>`);
+  document.write(`<p>exponential function is actually 1 + x + 0.5x<sup>2</sup> + (1/6)x<sup>3</sup> + ...</p>`);
+  
+  ck1 = 1 + point1 +  0.5 * point1**2;
+  ck2 = 1 + point2 +  0.5 * point2**2;
+  ck3 = 1 + point3 +  0.5 * point3**2;
+  control1 = E**point1 > ck1 ? ck1/(E**point1) : (E**point1)/ck1;
+  control2 = E**point2 > ck2 ? ck2/(E**point2) : (E**point2)/ck2;
+  control3 = E**point3 > ck3 ? ck3/(E**point3) : (E**point3)/ck3;
+  control = (control1+control2+control3)*0.333;
+  control = Math.floor(control*1e4)/1e2;
+  document.write(`<p>control value for (1 + x + 0.5x<sup>2</sup>) ~~ ${control} %</p>`);
+  ck1 = 1 + point1 +  0.5 * point1**2 + 0.16666 * point1**3;
+  ck2 = 1 + point2 +  0.5 * point2**2 + 0.16666 * point2**3;
+  ck3 = 1 + point3 +  0.5 * point3**2 + 0.16666 * point3**3;
+  control1 = E**point1 > ck1 ? ck1/(E**point1) : (E**point1)/ck1;
+  control2 = E**point2 > ck2 ? ck2/(E**point2) : (E**point2)/ck2;
+  control3 = E**point3 > ck3 ? ck3/(E**point3) : (E**point3)/ck3;
+  control = (control1+control2+control3)*0.333;
+  control = Math.floor(control*1e4)/1e2;
+  document.write(`<p>control value for (1 + x + 0.5x<sup>2</sup> + 0.16666x<sup>3</sup> ) ~~ ${control} %</p>`);
+  ck1 = 1 + point1 +  0.5 * point1**2 + 0.16666 * point1**3 + 0.041666 * point1**4;
+  ck2 = 1 + point2 +  0.5 * point2**2 + 0.16666 * point2**3 + 0.041666 * point2**4;
+  ck3 = 1 + point3 +  0.5 * point3**2 + 0.16666 * point3**3 + 0.041666 * point3**4;
+  control1 = E**point1 > ck1 ? ck1/(E**point1) : (E**point1)/ck1;
+  control2 = E**point2 > ck2 ? ck2/(E**point2) : (E**point2)/ck2;
+  control3 = E**point3 > ck3 ? ck3/(E**point3) : (E**point3)/ck3;
+  control = (control1+control2+control3)*0.333;
+  control = Math.floor(control*1e4)/1e2;
+  document.write(`<p>control value for (1 + x + 0.5x<sup>2</sup> + 0.16666x<sup>3</sup> + 0.041666x<sup>4</sup> ) ~~ ${control} %</p>`);
+  eFormula = `control value for 1 + x + 0.5x<sup>2</sup> + 0.16666x<sup>3</sup> + 0.041666x<sup>4</sup>`;
+  ck1 = 1 + point1 +  0.5 * point1**2 + 0.16666 * point1**3 + 0.041666 * point1**4 + 0.008333 * point1**5;
+  ck2 = 1 + point2 +  0.5 * point2**2 + 0.16666 * point2**3 + 0.041666 * point2**4 + 0.008333 * point2**5;
+  ck3 = 1 + point3 +  0.5 * point3**2 + 0.16666 * point3**3 + 0.041666 * point3**4 + 0.008333 * point3**5;
+  control1 = E**point1 > ck1 ? ck1/(E**point1) : (E**point1)/ck1;
+  control2 = E**point2 > ck2 ? ck2/(E**point2) : (E**point2)/ck2;
+  control3 = E**point3 > ck3 ? ck3/(E**point3) : (E**point3)/ck3;
+  control = (control1+control2+control3)*0.333;
+  control = Math.floor(control*1e4)/1e2;
+  document.write(`<p>${eFormula} + 0.008333x<sup>5</sup> ~~ ${control} %</p>`);
+  ck1 = 1 + point1 +  0.5 * point1**2 + 0.16666 * point1**3 + 0.041666 * point1**4 + 0.008333 * point1**5 + 0.001388 * point1**6;
+  ck2 = 1 + point2 +  0.5 * point2**2 + 0.16666 * point2**3 + 0.041666 * point2**4 + 0.008333 * point2**5 + 0.001388 * point2**6;
+  ck3 = 1 + point3 +  0.5 * point3**2 + 0.16666 * point3**3 + 0.041666 * point3**4 + 0.008333 * point3**5 + 0.001388 * point3**6;
+  control1 = E**point1 > ck1 ? ck1/(E**point1) : (E**point1)/ck1;
+  control2 = E**point2 > ck2 ? ck2/(E**point2) : (E**point2)/ck2;
+  control3 = E**point3 > ck3 ? ck3/(E**point3) : (E**point3)/ck3;
+  control = (control1+control2+control3)*0.333;
+  control = Math.floor(control*1e4)/1e2;
+  document.write(`<p>${eFormula} + 0.008333x<sup>5</sup> + 0.001388x<sup>6</sup> ~~ ${control} %</p>`);
+   
+  for (let z of testvalues) {
+	ckv = 1 + z + z * z * 0.5;
+	ckv = Math.floor(ckv*100)/100;
+	ckp = 1 + z +  0.5 * z**2 + 0.16666 * z**3 + 0.041666 * z**4 + 0.008333 * z**5 + 0.001388 * z**6;
+	ckp = Math.floor(ckp*1e4)/1e4;
+	approx = C + z*c1 + c2*z*z;
+    approx = Math.floor(approx*1000)/1000;
+    exp = Math.floor(E**z*1e4)/1e4;
+    document.writeln(`<p >${exp} e<sup>${z}</sup> --- ${approx} ~~ ${ckv} ~~ ${ckp}</p>`);
+  }  
+</script>
+</body>
+</html>  

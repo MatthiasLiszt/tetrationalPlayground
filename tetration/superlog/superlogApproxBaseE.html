@@ -1,0 +1,74 @@
+<html>
+<body>
+  <h2>testing a superlogarithm approximation with 16 coefficients</h2>
+<script>
+   E = Math.E;
+   B = E**(1/E);
+   B1 = B + 1e-6;       
+   BASE = `(e<sup>1/e</sup>+10<sup>-6</sup>)`;
+   lx = 1/Math.log(B1);	
+	
+  // values from the net
+  c1 = 0.91594605649953;
+  c2 = -0.20861842957759;
+  c3 = -0.05450400630209;
+  c4 = 0.07134941925273;
+  c5 = -0.02004387374438;
+  c6 = -0.01101258023037;
+  c7 = 0.01207268318645;
+  c8 = -0.00272922880760;
+  c9 = -0.00269905319156;
+  c10 = 0.00243941500632;
+  c11 = -0.00036220360858;
+  c12 = -0.00070125921262;
+  c13 = 0.00052782155380;
+  c14 = -0.00002987943551;
+  c15 = -0.00018614540434;
+  c16 = 0.00011722843042;
+  
+  document.writeln(`<h3>testing with values from the net </h3>`)
+  z = 0.1;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z}  <sup>${approx}</sup>e linear approx ${approx+1} ln ${Math.log(z)}</p>`);
+  z = 0.2;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z}  <sup>${approx}</sup>e linear approx ${approx+1} ln ${Math.log(z)}</p>`);
+  z = 2**0.5;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z}  <sup>${approx}</sup>e linear approx ${E**approx} ln ${Math.log(z)}</p>`);
+  z = 2;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z} <sup>${approx}</sup>e linear approx ${E**approx} ln ${Math.log(z)}</p>`);
+  z = E**0.25;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z}  <sup>${approx}</sup>e linear approx ${E**approx} ln ${Math.log(z)}</p>`);
+  z = E**0.75;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z} <sup>${approx}</sup>e linear approx ${E**approx} ln ${Math.log(z)}</p>`);
+  z = E;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3 + c4 * (z-1)**4;
+  approx += c5 * (z-1)**5 + c6 * (z-1)**6 + c7 * (z-1)**7 + c8 * (z-1)**8;
+  approx += c9 * (z-1)**9 + c10 * (z-1)**10 + c11 * (z-1)**11 + c12 * (z-1)**12;
+  approx += c13 * (z-1)**13 + c14 * (z-1)**14 + c15 * (z-1)**15 + c16 * (z-1)**16;
+  document.writeln(`<p>${z} <sup>${approx}</sup>e linear approx ${E**approx} ln ${Math.log(z)}</p>`);  
+</script>  
+</body>
+</html>    

@@ -1,0 +1,60 @@
+<html>
+<body>
+<h1>square super root</h1>
+<h3>by logarithm swapping and double logarithm</h3>
+<pre>
+  for the calculation double logarithm base 1+1e-6 are used
+  so instead of x**y
+  (1.000001 ** X) ** (1.000001 ** Y) is used
+  where X and Y are just the logarithms of x and y base 1+1e-6
+  
+  so the equivalent of dividing y by two is substracting the logarithm of 2 to the base 1+1e-6 from Y
+  the equivalent of doubling x is still doubling X
+  the variable "small" is approaching 0 which is the logarithm of 1 to any base 
+</pre>
+<script>
+	a = 8;
+	approx = 1e6;
+	based = 1+(1/approx);
+	base = based;
+	exponent = Math.floor(Math.log(a)*approx);
+	logExponent = Math.floor(Math.log(exponent)*approx);
+	logBase = 1;
+	newLogBase = logBase;
+	check = logExponent;
+	iteration = 0;
+	lgTwo = Math.floor(Math.log(2)*approx);
+	small = -lgTwo;
+	smallToBase = 0.5;
+	quantum = 0.25;
+	quantumHalfing = 0;
+	baseAdjuster = 2;
+	//console.log(`(${based}**${logBase})**(${based}**${logExponent})`);
+	while(iteration < 100 && quantumHalfing < 9) {
+          logBase = newLogBase;
+          logExponent = check;		
+	  check += small;
+	  newLogBase *= baseAdjuster;
+	  while (newLogBase > check && quantumHalfing < 9) {
+	    small = Math.floor(Math.log(based ** small + quantum)*approx);
+	    smallToBase += quantum;
+	    quantum /= 2;
+	    ++quantumHalfing;
+	    check = logExponent + small;
+	    baseAdjuster = 1 / smallToBase;
+	    newLogBase = logBase * baseAdjuster;
+	  }  
+	  ++iteration;
+	}
+	console.log('end');	
+	console.log(iteration);
+	
+	
+</script>
+<script>
+	rounded = Math.floor((based ** logBase) * 1e4)/1e4;
+	document.write(`<p>square super root of ${a} is around ${rounded}</p>`);
+	document.write(`<p>preliminary result by ${iteration} iterations</p>`);
+</script>
+</body>
+</html>

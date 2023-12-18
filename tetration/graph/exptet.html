@@ -1,0 +1,274 @@
+<html>
+<body>
+
+<h3>exponential function and tetrational function base e</h3>
+<h6>--- exponential f. (orange), exponential approx(green), tetrational approx (blue)</h6>
+<p></p><canvas id="Real" width="640" height="400" style="background-color: lightgrey;"></canvas></p>
+<h3> ... on the complex plane </h3>
+<h6>--- exponential f. (orange), exponential approx(green), tetrational approx (blue)</h6>
+<p><canvas id="Complex" width="640" height="400" style="background-color: lightgrey;"></canvas></p>
+<script>
+maxX = 640;
+maxY = 400;
+midX = maxX*0.5;
+midY = maxY*0.5;
+var canvas = document.getElementById( "Real" );  
+var context = canvas.getContext( "2d" );  
+var e = Math.E;
+var zoom = 50;
+var step = 0.01;
+
+// grid
+context.beginPath();   
+context.strokeStyle = "grey";  
+context.moveTo(midX,0);  
+context.lineTo(midX,maxY);
+context.stroke();  
+context.beginPath();   
+context.strokeStyle = "grey";  
+context.moveTo(0,midY);  
+context.lineTo(maxX,midY);
+context.stroke();  
+
+//drawing exponential function 
+
+for(let i = -3; i < 3; i+=step){
+  r = e ** i;
+  x = i*zoom + midX;
+  y = r*zoom + midY;
+  if(y < maxY) {
+    context.beginPath();   
+    context.strokeStyle = "red";  
+    context.moveTo(x-1,maxY - y);  
+    context.lineTo(x,maxY - y);
+    context.stroke();  
+  }
+} 
+console.log('exponential function drawn');
+
+//drawing approximated exponential function 1 + x + 0.5x*x + (1/6)*x*x*x + ...
+
+for(let i = -3; i < 3; i+=step){
+  r = 1 + i + 0.5 * i**2 + (1/6) * i**3 + (1/24) * i**4 + (1/120) * i**5 + (1/720) * i**6 + (720*7)**-1 * i**7;
+  x = i*zoom + midX;
+  y = r*zoom + midY;
+  if(y < maxY) {
+    context.beginPath();   
+    context.strokeStyle = "green";  
+    context.moveTo(x-1,maxY - y);  
+    context.lineTo(x,maxY - y);
+    context.stroke();  
+  }
+} 
+console.log('exponential function drawn');
+
+//drawing tetrational function 
+
+for(let i = -3; i < 3; i+=step){
+  r = tetApprox(i);
+  x = i*zoom + midX;
+  y = r*zoom + midY;
+  if(y < maxY) {
+    context.beginPath();   
+    context.strokeStyle = "blue";  
+    context.moveTo(x-1,maxY - y);  
+    context.lineTo(x,maxY - y);
+    context.stroke();     
+  }
+} 
+console.log('tetrational function drawn');
+
+function tet(x, n) {
+ if (n<=0) return 1;
+ n = Math.abs(n);
+ let h = x;	
+ for(j = 1;j < n; ++j)	{
+    h = x ** h;  
+  } 
+ return h;
+}
+
+function tetApprox(n){
+  v = 0;
+  v = n >= -3 && n <-2 ? Math.log(Math.log(3+n)) : v;
+  v = n >= -2 && n <-1 ? Math.log(2+n) : v;
+  v = n >= -1 && n <=0 ? 1+n : v;
+  v = n >= 0 && n <=1 ? e**n : v;
+  v = n > 1 && n < 2 ? e**e**(n-1) : v;
+  v = n > 2 && n < 3 ? e**e**e**(n-2) : v;
+  return v;
+}
+
+// functions on the complex plane
+
+var canvas = document.getElementById( "Complex" );  
+var context = canvas.getContext( "2d" );  
+
+// exponential function 
+
+var max = 180;
+var newStep = 0.05;
+for(let k = -(max**2); k < (max**2); ++k){
+  g = Math.floor(k/max)*newStep;
+  q = (k%max)*newStep;
+  r = e**g * Math.cos(q);
+  i = e**g * Math.sin(q);
+  x = r*zoom + midX;
+  y = i*zoom + midY;
+  if(y < maxY) {
+    context.beginPath();   
+    context.strokeStyle = "orange";  
+    context.moveTo(x-1,maxY - y);  
+    context.lineTo(x,maxY - y);
+    context.stroke();     
+  }
+} 
+
+
+// exponential function approximation 1 + x + 0.5x*x + (1/6)*x*x*x + ...
+
+var max = 180;
+var newStep = 0.05;
+for(let k = -(max**2); k < (max**2); ++k){
+  g = Math.floor(k/max)*newStep;
+  q = (k%max)*newStep;
+  
+  var toSum = [];
+  z = {real: g, i: q};
+  p2 = cmul(z,z);
+  p3 = cmul(p2,z); 
+  p4 = cmul(p3,z); 
+  p5 = cmul(p4,z); 
+  p6 = cmul(p5,z);
+  p7 = cmul(p6,z);
+  p8 = cmul(p7,z);
+  p9 = cmul(p8,z);
+  toSum.push({real: 1, i: 0}); 
+  toSum.push({real: z.real, i: z.i}); 
+  toSum.push({real: p2.real*0.5, i: p2.i*0.5}); 
+  toSum.push({real: p3.real*(1/6), i: p3.i*(1/6)}); 
+  toSum.push({real: p4.real*(1/24), i: p4.i*(1/24)}); 
+  toSum.push({real: p5.real*(1/120), i: p5.i*(1/120)}); 
+  toSum.push({real: p6.real*(1/720), i: p6.i*(1/720)}); 
+  toSum.push({real: p7.real*(1/(720*7)), i: p7.i*(1/(720*7))}); 
+  toSum.push({real: p8.real*(1/(720*7*8)), i: p8.i*(1/(720*7*8))}); 
+  toSum.push({real: p9.real*(1/(720*7*8*9)), i: p9.i*(1/(720*7*8*9))}); 
+  res = csum(toSum);
+  
+  x = res.real*zoom + midX;
+  y = res.i*zoom + midY;
+  if(y < maxY) {
+    context.beginPath();   
+    context.strokeStyle = "green";  
+    context.moveTo(x-1,maxY - y);  
+    context.lineTo(x,maxY - y);
+    context.stroke();     
+  }
+} 
+
+// tetrational function
+var max = 90;
+var lastdrawn = 0;
+for(let k = -max; k < (max**2); ++k){
+  var result;
+  color = 'blue';
+  g = Math.floor(k/max)*newStep;
+  q = (k%max)*newStep;
+    
+  result = ctet({real: g, i: q});  
+  x = result.real*zoom + midX;
+  y = result.i*zoom + midY;
+  if(y < maxY) {
+    context.beginPath();   
+    context.strokeStyle = color;  
+    context.moveTo(x-1,maxY - y);  
+    context.lineTo(x,maxY - y);
+    context.stroke();     
+    lastdrawn = result;
+  }
+} 
+console.log(`complex tetrational function drawn, last point ${lastdrawn.real}+${lastdrawn.i}i`);
+
+function cmul(a, b){
+  var r = a.real*a.real -  b.real*b.real;
+  var i = 2 * a.i * b.i;
+  return {real: r, i: i};
+}
+
+function csum(n){
+  var sum = {real: 0, i: 0};
+  for (let S of n){
+    sum.real += S.real;
+    sum.i += S.i;
+  } 
+  return sum;
+}
+
+function ctet(z) {
+  // warning!!! only accurate for values less than 2 
+  var toSum = [];
+  c0 = 0.30685281944005469058;
+  c1 = 1.18353470251664338875;
+  c2 = 1.58593285160678321155;
+  c3 = 1.36629265207672068172;
+  c4 = 1.36264601823980036066; 
+  c5 = 1.21734246689515424045; 
+  c6 = 1.10981816083559525765; 
+  c7 = 0.96674692974769849130; 
+  c8 = 0.84089872598668435888; 
+  c9 = 0.71353210966804747617; 
+  c10 = 0.60168548504001373445;     
+  
+  Cz = {real: z.real+2, i: z.i+2 };
+  Cr = 0.5 * Math.log(Cz.real*Cz.real+Cz.i*Cz.i); 
+	CIm = Math.atan(Cz.i/Cz.real);
+  
+  z = {real: z.real*0.5, i: z.i*0.5};
+     
+  toSum.push({real: Cr, i: CIm});
+  toSum.push({real: c0, i: 0});
+  toSum.push({real: c1 * z.real, i: c1 * z.i});
+  p2 = cmul(z,z);
+  toSum.push({real: p2.real * c2, i: p2.i * c2});
+  p3 = cmul(p2,z);
+  toSum.push({real: p3.real * c3, i: p3.i * c3});
+  p4 = cmul(p3,z);
+  toSum.push({real: p4.real * c4, i: p4.i * c4});
+  p5 = cmul(p4,z);
+  toSum.push({real: p5.real * c5, i: p5.i * c5});
+  p6 = cmul(p5,z);
+  toSum.push({real: p6.real * c6, i: p6.i * c6});
+  p7 = cmul(p6,z);
+  toSum.push({real: p7.real * c7, i: p7.i * c7});
+  p8 = cmul(p7,z);
+  toSum.push({real: p8.real * c8, i: p8.i * c8});
+  p9 = cmul(p8,z);
+  toSum.push({real: p9.real * c9, i: p9.i * c9});
+  p10 = cmul(p9,z);
+  toSum.push({real: p10.real * c10, i: p10.i * c10});
+  return csum(toSum); 
+}
+
+
+// however e**e**z with complex numbers is still complicated enough
+// so no need to even make it e**(e + i)**z
+//r = e**e**g * Math.cos(q);
+//i = e**e**g * Math.sin(q);
+// first part 
+// (e + i)**(g + qi) to base e
+// rp = (g*g+q*q)**0.5
+// Th = atan(q/g)
+// e ** (ln(rp) + iTh)
+// second part 
+// r = e**ln(rp) * Math.cos(Th)
+// i = e**ln(rp) * Math.sin(Th)
+//test 
+// e**(2+3i) ~ -7.3151 + 1.0427i
+// e**(7.3151+1.0427i) ~ 757.257 + 1289.09i
+// e**e**(2+3i) ~ 0.000355 + 0.000574i
+// thus it can't be simply done backwards
+
+</script>
+
+</body>
+</html>

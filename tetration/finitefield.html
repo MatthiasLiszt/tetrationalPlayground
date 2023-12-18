@@ -1,0 +1,25 @@
+<html>
+<body>
+  <h1>testing errors in (e^^b)^(e^^c) = (e^^(c+1))^(e^^(b-1)) </h1>
+  <h6>a unique property of tetration</h6>
+  <script>
+	  e = Math.E;
+	  step = 0.1;
+	  found = 0;
+	  tolerance = 1e-14;
+	  for(j = step;j < 1; j += step){
+	    for(i = step; i < 0.9; i += step) {
+			t1 = (e**e**i)**(e**j);
+			t2 = (e**e**j)**(e**i);
+			if (Math.abs(t1-t2)>tolerance) {
+			  if(i!==1&&i!==2&&i!==0) {	
+			    document.writeln(`<p> ${Math.floor((i+1)*10)/10} ${Math.floor(j*10)/10} ${t1-t2} </p>`);
+			    ++found;
+			  }  
+			}  
+		}	  
+	  }
+	  document.writeln(`<bold>${found} found</bold>`);
+  </script>
+</body>
+</html>

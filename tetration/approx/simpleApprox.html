@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>simple approximation 1+x+x<sup>4</sup> for e<sup>x</sup> and <sup>x</sup>e</h1>
+  <p>the exponential function is a good approximation for the tetraion base e in the range between 0 to 1</p>
+  <p><i><del>a slightly better approximation for tetration might be 1 + x + x^4 + x^5</del></i></p>
+  <p><i>best matches are in the range -0.63 to 0.818 for exponentiation and -0.315 to 0.818 for tetration </i></p>
+<script> 
+   
+  E = Math.E;
+   
+      
+  testvalues = [-0.63, -0.4725, -0.315, -0.25,  -0.2, -0.1575, 0.10225, 0.2045, 0.22, 0.3, 0.409, 0.818];
+  
+  function tet(x) {
+    var r = 0;
+    r = x>= 0 && x <=1 ? E**x : r;
+    r = x < 0 ? x + 1 : r;
+    r = x>= 1 && x <=2 ? E**E**(x-1) : r;
+    return r;
+  }
+   
+  lowPercent = 0.01; 
+  highPercent = 0.03; 
+  for (let z of testvalues) {
+    ckv = 1 + z + z**4;
+    ckv = Math.floor(ckv*1e4)/1e4;	
+    tetA = 1 + z + z**4 + z**5;
+    exp = Math.floor(E**z*1e4)/1e4;
+    tetE = Math.floor(tet(z)*1e4)/1e4;
+    diff = Math.abs(exp-ckv);
+    color = diff > lowPercent ? 'grey' : 'black'; 
+    color = diff > highPercent ? 'red' : color; 
+    document.writeln(`<p style="color: ${color};">${exp} ~ e<sup>${z}</sup> --- <sup>${z}</sup>e ~ ${tetE} --- 1 + ${z} + ${z}<sup>4</sup> ~ ${ckv}</p>`);
+  }  
+  document.write(`<p><i>derivations greater than ${highPercent*100} % in red</i></p>`);
+</script>
+</body>
+</html>  

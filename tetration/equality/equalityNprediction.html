@@ -1,0 +1,56 @@
+<html>
+<body>
+	<h1>solutions to <sup>n</sup>b = b<sup>n</sup></h1>
+<script>
+	e = Math.E;
+	end = e ** (1/e); 
+	max = 32;
+	
+	function tet(x, n) {
+	  let h = x;	
+	  for(j = 1;j < n; ++j)	{
+		  h = x ** h;  
+	  } 
+	  return h;
+	}
+	N = 3;
+	tolerance = 1e-6;
+	minStep = 1e-9;
+	step = minStep;
+	solutions = [];
+	solutions.push(2);
+	i = end;
+	it = 0;
+	do {
+		i += step;
+		expR = i**N;
+		tetR = tet(i,N);
+		diff = Math.abs((i**N) - tet(i,N));
+		if (diff < tolerance) {
+			console.log(`${N} ${i} d ${diff} step ${step}`);
+			solutions.push(i);
+			++N;
+			step = minStep;
+			i = end;
+		}
+		i = tetR > expR ? i - step : i;
+		step = tetR < expR ? step*2 : step;
+		step = tetR > expR ? step/2 : step;				
+		++it;
+	} while (N<max && step > 1e-15 && it < (max*100));
+	N = 2;
+	for (let solution of solutions) {
+	  const round = 1/tolerance;	
+	  const rounded = Math.floor(solution*round)/round;	
+	  const C = 3.238990951;
+	  const d = solution - end;
+	  let predicted = ((1/d)**0.5)*C*((1-d)**0.5)-end**0.5;
+	  predicted = Math.floor(predicted*1e4)/1e4;
+	  let delta = predicted / N >= 1 ? ((predicted/N) - 1) * 100 : (1 - (predicted/N)) * 100;
+	  delta = Math.floor(delta * 100)/100;
+	  document.write(`<p> b<sup>${N}</sup> = <sup>${N}</sup>b ~ ${rounded} ... predicted ${predicted} difference ${delta} %</p>`);
+	  ++N;
+	}  
+</script>	
+</body>
+</html>

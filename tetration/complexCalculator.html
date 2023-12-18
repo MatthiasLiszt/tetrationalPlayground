@@ -1,0 +1,26 @@
+<html>
+<body>
+<h1>complex natural logarithm</h1>
+
+<input id="Real" type="number" placeholder="real" />
+<input id="Imaginary" type="number" placeholder="imaginary" />
+<button onclick="calc()" >calculate</button>
+<script>
+	
+   function calc(){
+	 r = document.getElementById('Real').value; 
+	 c = document.getElementById('Imaginary').value; 
+	 console.log(r +' '+ c);
+	 c = parseFloat(c);
+	 r = parseFloat(r);
+	 result = clog(c,r);
+	 document.write(`ln(${r}+${c}i) = ${result.real} + ${result.i} i`);	 
+   }	
+   function clog(c, r){
+	 x = 0.5 * Math.log(r*r+c*c); 
+	 Im = Math.atan(c/r);
+	 return {real: x, i: Im};
+   }
+</script>
+</body>
+</html>

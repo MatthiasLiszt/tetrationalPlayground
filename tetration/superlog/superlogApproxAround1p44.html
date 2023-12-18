@@ -1,0 +1,201 @@
+<html>
+<body>
+<script> 
+   
+   E = Math.E;
+   B1 = E ** (1 / E) + 1e-6;     
+   primes=[2,3,5,7,11,13,17,19];
+   tetrationTab = [];
+   superlogTab = [];       
+   
+   // create tetrationTab
+    c = B1;
+    tetrationTab.push(1);
+    while (c < 20) {          
+      c = B1 ** c;
+      tetrationTab.push(c);	    
+    }
+    
+    for (let i = 0; i < tetrationTab.length; ++i) {
+	  one = tetrationTab[i];	
+	  exactness = 0.01;	
+	  difference=Math.floor(one*100)-one*100;
+	  if(Math.abs(difference)<exactness){
+		superlogTab.push({slog: i, value: Math.floor(one*100)/100});
+	  }
+	}
+    console.log(`tetration table complete with ${tetrationTab.length} entries`);
+    console.log(`superlog table complete with ${superlogTab.length} entries`);
+    superlogTab.length = 20;
+    console.log(`cutted superlog table complete to ${superlogTab.length} entries`);
+    
+</script>
+<h2>finding an approximation for the superlog base e<sup>1/e</sup>+10<sup>-6</sup></h2>
+<script>
+  max = 10;	
+  tabLength = superlogTab.length;
+  best = 0;
+  c1 = 0;
+  c2 = 0;
+  c3 = 0;
+  c4 = 0;
+  for (let q = 0;q < 1e4; q+=10) {
+    score = 0;	
+    check1 = Math.floor(q/1000);
+    check2 = Math.floor((q%1000)/100);
+    check3 = Math.floor((q%100)/10);
+    check4 = q%10;
+    check1 = check1 > 0 && check1 <= 5 ? max / check1 : check1;
+    check1 = check1 > 5 ? -max / (check1-5) : check1;
+    check2 = check2 > 0 && check2 <= 5 ? max / check2 : check2;
+    check2 = check2 > 5 ? -max / (check2-5) : check2;
+    check3 = check3 > 0 && check3 <= 5 ? max / check3 : check3;
+    check3 = check3 > 5 ? -max / (check3-5) : check3;
+    check4 = check4 > 0 && check4 <= 5 ? max / check4 : check4;
+    check4 = check4 > 5 ? -max / (check4-5) : check4;
+    for (j = 0; j < tabLength; ++j) { 
+       z = superlogTab[j].value;	
+       slog = superlogTab[j].slog;
+       sum = (z-1)*check1 + check2 * (z-1)**2 + check3 * (z-1)**3;// + check4 * (z-1)**4; 	  
+       quotient = Math.abs(sum/slog);
+       score = quotient > 0.5 && quotient < 2 && sum > 0 ? score+=0.01 : score;
+       score = quotient > 0.98 && quotient < 1.02 && sum > 0 ? score+=1 : score;	  
+    }	
+    // needs to be pass through at least 3 points to be a curve
+    p = 1;
+    sum1 = (p-1)*check1 + check2 * (p-1)**2 + check3 * (p-1)**3;// + check4 * (p-1)**4;;
+    p = 2.25;
+    sum2 = (p-1)*check1 + check2 * (p-1)**2 + check3 * (p-1)**3;// + check4 * (p-1)**4;;
+    p = 2.50825; //p = 2.617925; 49  p = 2.66684; 100 p = 2.69217; 200
+    sum3 = (p-1)*check1 + check2 * (p-1)**2 + check3 * (p-1)**3;// + check4 * (p-1)**4;;
+    point1 = 0;
+    point2 = 7;
+    point3 = 21;
+    around = 0.5;
+    p1 = sum1 > (point1*around) && sum1 < (point1*(1/around));
+    p2 = sum2 > (point2*around) && sum2 < (point2*(1/around));
+    p3 = sum3 > (point3*around) && sum3 < (point3*(1/around));
+    if (p2 && p3) {
+      c1 = score > best ? check1 : c1;
+      c2 = score > best ? check2 : c2;
+      c3 = score > best ? check3 : c3;
+      c4 = score > best ? check4 : c4;
+      best = score > best ? score : best;  
+    }  
+  }
+  hits = Math.floor((best/tabLength)*100*1e4)/1e4;
+  document.writeln(`<p>1st round: best coefficients probably around ${c1}, ${c2}, ${c3}, ${c4} with around ${hits}% hits</p>`);    
+  
+  oc1 = c1;
+  oc2 = c2;
+  oc3 = c3;
+  oc4 = c4;
+    
+  step = (max/1e2);
+  where = 0;
+  
+  for (let q = 0;q < 10000; ++q) {
+    score = 0;	
+    check1 = Math.floor(q/1000);
+    check2 = Math.floor((q%1000)/100);
+    check3 = Math.floor((q%100)/10);
+    check4 = q%10;
+    check1 = check1 > 0 && check1 <= 5 ? check1 * step + oc1 : check1;
+    check1 = check1 > 5 ? oc1 - (check1 - 5) * step : check1;
+    check2 = check2 > 0 && check2 <= 5 ? check2 * step + oc2 : check2;
+    check2 = check2 > 5 ? oc2 - (check2 - 5) * step : check2;
+    check3 = check3 > 0 && check3 <= 5 ? check3 * step + oc3 : check3;
+    check3 = check3 > 5 ? oc3 - (check3 - 5) * step : check3;
+    check4 = check4 > 0 && check4 <= 5 ? check4 * step + oc4 : check4;
+    check4 = check4 > 5 ? oc4 - (check4 - 5) * step : check4;
+    
+    for (j = 0; j < tabLength; ++j) { 
+      local = 0;
+      z = superlogTab[j].value;	
+      slog = superlogTab[j].slog;
+      sum = (z-1)*check1 + check2 * (z-1)**2 + check3 * (z-1)**3; // + check4 * (z-1)**4; 	  
+      quotient = Math.abs(sum/slog);
+      score = quotient > 0.5 && quotient < 2 && sum > 0 ? score+=0.01 : score;
+      score = quotient > 0.99 && quotient < 1.01 && sum > 0 ? score+=1 : score;	  
+      local = quotient > 0.9 && quotient < 1.1 && sum > 0 ? 1 : local;	  
+      if(local == 1){where = z;}
+    }	
+    // needs to be pass through at least 3 points to be a curve
+    p = 1;
+    sum1 = (p-1)*check1 + check2 * (p-1)**2 + check3 * (p-1)**3 + check4 * (p-1)**4;;
+    p = 2.25;
+    sum2 = (p-1)*check1 + check2 * (p-1)**2 + check3 * (p-1)**3  + check4 * (p-1)**4;;
+    p = 2.50825; // p = 2.617925; 49  p = 2.66684; 100 p = 2.69217; 200
+    sum3 = (p-1)*check1 + check2 * (p-1)**2 + check3 * (p-1)**3 + check4 * (p-1)**4;;
+    point1 = 0;
+    point2 = 7;
+    point3 = 21;
+    around = 0.5;
+    p1 = sum1 > (point1*around) && sum1 < (point1*(1/around));
+    p2 = sum2 > (point2*around) && sum2 < (point2*(1/around));
+    p3 = sum3 > (point3*around) && sum3 < (point3*(1/around));
+    if (p2 && p3) {
+      c1 = score > best ? check1 : c1;
+      c2 = score > best ? check2 : c2;
+      c3 = score > best ? check3 : c3;
+      c4 = score > best ? check4 : c4;
+      best = score > best ? score : best;  
+    }      
+  }
+
+  hits = Math.floor((best/tabLength)*100*1e6)/1e6;
+  document.writeln(`<p>2nd round: best coefficients probably around ${c1}, ${c2}, ${c3}, ${c4} with around ${hits}% hits</p>`);
+  document.write(`<p>best match at ${where}</p>`);    
+  
+  BASE = "e<sup>1/e</sup>+10<sup>-6</sup>";
+  formula = `${c1}(z-1) + ${c2}(z-1)<sup>2</sup> + ${c3}(z-1)<sup>3</sup> + ${c4}(z-1)<sup>4</sup>`;
+  document.writeln(`<h3>testing ${formula}...</h3>`)
+  z = Math.floor((B1 ** B1)*1e4)/1e4;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p>${z} <sup>2</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 2;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p>${z} <sup>4</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = Math.floor((B1 ** B1 ** B1 ** B1 ** B1 ** B1)*1e4)/1e4;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p>${z} <sup>6</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 2.25;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p>${z} <sup>7</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 2.32;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p>${z} <sup>9</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 2.617;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p style="color: grey;">${z} <sup>49</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 2.72;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p style="color: red;">${z} <sup>2000</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 2.77;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p style="color: red;">${z} <sup>3129</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+  z = 3;
+  approx = (z-1)*c1 + (z-1)*(z-1)*c2 + c3 * (z-1)**3;
+  approx = Math.floor(approx*1000)/1000;
+  rounded = Math.round(approx);
+  document.writeln(`<p style="color: red;">${z} <sup>3215</sup>(${BASE}) --- <sup>${approx}</sup>(${BASE}) ${tetrationTab[rounded]}</p>`);
+    
+</script>
+</body>
+</html>

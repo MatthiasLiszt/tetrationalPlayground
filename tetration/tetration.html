@@ -1,0 +1,47 @@
+<html>
+<body>
+<script>
+E = Math.E;
+B1 = E**(1/E);
+B2 = B1*(1+1e-9);
+
+document.writeln('<h2>super logarithm base ' + B1 + ' ' + B2 + '</h2>');
+
+current1 = B1;
+current2 = B2;
+iteration = 0;
+while(iteration < 20) {
+  //document.writeln('<p>' + iteration + ' ' + current1 + ' ' + current2 + '</p>');	 
+  current1 = B1 ** current1;
+  current2 = B2 ** current2;
+  ++iteration;
+}
+
+current1 = B1;
+current2 = B2;
+iteration = 0;
+slogB1 = [];
+slogB2 = [];
+UPPER = 3;
+LOWER = 2.5;
+start = 0;
+while (current2 < UPPER && iteration < 2e5) {
+  if (current2 > LOWER) {
+    slogB1.push(current1);    
+    slogB2.push(current2);
+  }	
+  if (start == 0) start = iteration;
+  if (iteration%1e4 == 0) console.log(iteration);
+  current1 = B1 ** current1;
+  current2 = B2 ** current2;
+  ++iteration;
+}
+
+for (let i=0;i < slogB1.length; ++i) {
+  document.writeln('<p>' + (start + i) + ' ' + slogB1[i] + ' ' + slogB2[i] + '</p>');
+}
+
+
+</script>
+</body>
+</hmtl>

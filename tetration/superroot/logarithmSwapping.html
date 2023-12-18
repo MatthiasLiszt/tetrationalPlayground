@@ -1,0 +1,60 @@
+<html>
+<body>
+<h1>square super root</h1>
+<h3>by logarithm swapping</h3>
+<script>
+	a = 8;
+	base = 1+1e-6;
+	newbase = base;
+	exponent = Math.floor(Math.log(a)*1e6);
+	check = exponent;
+	iteration = 0;
+	small = 0.5;
+	while(newbase < check) {
+      base = newbase;
+      exponent = check;		
+	  check *= small;
+	  newbase *= newbase;
+	  ++iteration;
+	}
+	console.log('end of squaring');	
+	console.log(iteration);
+	
+	
+	newbase = base;
+	check = exponent;
+	
+	// small = 1 - 2e-8;
+	small = 0.75 + 0.125 + 1/16 + 1/32 + 1/64; 
+	while(newbase < check && iteration < 100) {
+      base = newbase;
+      exponent = check;		
+	  check *= small;
+	  newbase = newbase ** (1/small);
+	  ++iteration;
+	}
+	console.log('end ...');	
+	console.log(iteration);
+	
+	newbase = base;
+	check = exponent;
+	small += 1/128 + 1/256 + 1/512 + 1/1024 + 1/2048 + 1/4096;
+	while(newbase < check && iteration < 200) {
+      base = newbase;
+      exponent = check;		
+	  check *= small;
+	  newbase = newbase ** (1/small);
+	  ++iteration;
+	}
+	console.log('end');	
+	console.log(iteration);
+	
+	
+</script>
+<script>
+	rounded = Math.floor(base * 1e4)/1e4;
+	document.write(`<p>square super root of ${a} is around ${rounded}</p>`);
+	document.write(`<p>preliminary result by ${iteration} iterations</p>`);
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<html>
+<body>
+<h1>square super root</h1>
+<h3>by binary search</h3>
+<script>
+	a = 8;
+	iteration = 0;
+	guess = 1;
+	check = guess;
+	increase = 2;
+	quantum = 0.5;
+	exactness = 0.0001;
+	difference = Math.abs((check ** check) - a);
+	
+	while ( difference > exactness && iteration < 100) {
+	  guess = check;
+	  check = guess * increase;
+      if (check ** check > a) {
+		increase -= quantum;
+		quantum /= 2;
+		check = guess;
+	  }	
+      difference = Math.abs((check ** check) - a);
+      ++iteration; 		
+	}
+	
+	console.log('end');	
+	console.log(iteration);
+	
+	
+</script>
+<script>
+	rounded = Math.floor(guess * 1e4)/1e4;
+	document.write(`<p>square super root of ${a} is around ${rounded}</p>`);
+	document.write(`<p>preliminary result by ${iteration} iterations</p>`);
+</script>
+</body>
+</html>

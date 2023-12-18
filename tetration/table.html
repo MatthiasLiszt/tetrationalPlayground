@@ -1,0 +1,30 @@
+<html>
+<body>
+	<script>
+		E = Math.E;
+        B = E**(1/E);
+        B1 = B + 1e-9;
+        
+        document.writeln(`<h1>superlog base e^(1/e)+1e-9 </h1>`);
+        
+        slow = [];
+        GOAL = 5;
+        
+        start = Date.now();
+        
+        r = B1;
+        slow.push(r);
+        while (r<GOAL) {
+		  r = B1 ** r;
+		  slow.push(r);
+		}
+        
+        end = Date.now();
+        timeSlow = end - start;
+        
+        document.writeln(`<p> slow method took ${timeSlow} ms</p>`);      
+       
+        
+	</script>
+</body>
+</html>

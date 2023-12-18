@@ -1,0 +1,28 @@
+<html>
+<body>
+<h1>filling numbers up to hundred with 2, 3, 5 and 7</h1>
+<h3>by binary search</h3>
+<script>
+   list = [];
+   max = 100;
+   for (i = 1;i < max; ++i){
+	   change = i;
+	   check = i;
+	   do {
+		   previous = change;
+		   change = !(change % 2) ?  change/2 : change;
+		   change = !(change % 3) ?  change/3 : change;
+		   change = !(change % 5) ?  change/5 : change;
+		   change = !(change % 7) ?  change/7 : change;
+	   }
+	   while (change < previous);
+	   //console.log(`${check} ${change}`);
+	   if (change == 1) list.push(check);
+   }
+	
+</script>
+<script>
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<html>
+<body>
+<h1>Approximation of Tetration with 10 coefficients </h1>
+<h3>by a Taylor series and by the linear approximation </h3>
+
+<p>This is approximation is only accurate for x &lt; 2.</p>
+<p>The linear approximation is e<sup>x</sup> below e and 
+   e<sup>e<sup>x</sup></sup> between e and e<sup>2</sup>.
+</p>
+
+<script>
+    
+    c0 = 0.30685281944005469058;
+    c1 = 1.18353470251664338875;
+    c2 = 1.58593285160678321155;
+    c3 = 1.36629265207672068172;
+    c4 = 1.36264601823980036066; 
+    c5 = 1.21734246689515424045; 
+    c6 = 1.10981816083559525765; 
+    c7 = 0.96674692974769849130; 
+    c8 = 0.84089872598668435888; 
+    c9 = 0.71353210966804747617; 
+    c10 = 0.60168548504001373445;   
+   
+    resultsTaylor = [];
+    resultsLinear = [];
+    
+    function calcTetration(z) {
+      C = Math.log(z + 2); 
+      z *= 0.5;
+      T1 = c0 + c1 * z + c2 * z * z + c3 * (z ** 3) + c4 * (z ** 4);
+      T2 = c5 * (z ** 5) + c6 * (z ** 6) + c7 * (z ** 7) + c8 * (z ** 8);
+      T3 = c9 * (z ** 9) + c10 * (z ** 10);
+      T = C + T1 + T2 + T3;
+      return T;
+    }
+	
+    E = Math.E;
+    
+    function getSimilarity(a, b) {
+      quotient = a > b ? b / a : a / b;
+      return Math.floor(((1 - quotient) * 100)*1e4)/1e4; 
+    }
+    	
+    console.log('check');	
+    document.write(`<p>e<sup>0.125</sup> ${E**0.125} ${calcTetration(0.125)} div ${getSimilarity(calcTetration(0.125),E**0.125)}%</p>`);
+    document.write(`<p>e<sup>0.5</sup> ${E**0.5} ${calcTetration(0.5)} div ${getSimilarity(calcTetration(0.5),E**0.5)}%</p>`);
+    document.write(`<p>e<sup>0.69</sup> ${E**0.69} ${calcTetration(0.69)} div ${getSimilarity(calcTetration(0.69),E**0.69)}%</p>`);
+    console.log('end');
+</script>
+
+</body>
+</html>

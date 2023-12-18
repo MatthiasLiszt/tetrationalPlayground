@@ -1,0 +1,68 @@
+<html>
+<body>
+  <h1>logarithm and super logarithm of primes < 20 base e<sup>1/e</sup>+10<sup>-6</sup></h1>	       
+<script> 
+   E = Math.E;
+   B = E**(1/E);
+   B1 = B + 1e-6;       
+   BASE = `(e<sup>1/e</sup>+10<sup>-6</sup>)`;
+   lx = 1/Math.log(B1);
+     
+   primes=[2,3,5,7,11,13,17,19];
+   superlogTab = [];       
+   
+   // create superlogTab
+    c = B1;
+    superlogTab.push(1);
+    while (c < 20) {          
+      c = B1 ** c;
+      superlogTab.push(c);	    
+    }
+    console.log(`superlog table complete with ${superlogTab.length} entries`);
+   
+   warning = false;	
+   for (let prime of primes) {
+     x = prime;
+     slog = 0;
+     while (x>1) {
+       x = Math.log(x)*lx;
+       ++slog;
+     }
+     log = Math.log(prime)*lx;
+     Log = Math.floor(log*1e6)/1e6;
+     //document.writeln(`<p>${prime} <sup>${slog-1}</sup>${B1} </p>`);
+     difference = superlogTab[slog] - prime;
+     if (difference < 0.2) {
+       document.writeln(`<p>${prime}  ...  ${BASE}<sup>${Log}</sup>  ...  <sup>${slog-1}</sup>${BASE} </p>`);
+     } else {
+       if (!warning) {	     
+         document.writeln(`<p style='color: red;'>the difference between prime and superlogarithm is ${difference}</p>`);
+	 warning = true;
+       }	 
+     }  
+   }
+
+    
+</script>
+<h2>finding e in the superlog table of base e<sup>1/e</sup>+10<sup>-6</sup></h2>
+<script>
+  eAt=0;	
+  for(let i=0;superlogTab[i]<E;++i) {++i;eAt=i;}
+  document.write(`<p>e  <sup>${eAt}</sup>(e<sup>1/e</sup>+10<sup>-6</sup>)</p> `);
+</script>
+<h2>finding superlogarithm base e from base e<sup>1/e</sup>+10<sup>-6</sup></h2>
+<script>
+   // e = e ** 1  = e ^^ (slogb(1) + 1) = e ^^ (0 + 1)
+   // B1 ** (1/Math.log(B1)) =  B1 ^^ (slogB1(1/Math.log(B1)) + 1);
+   ex = (1/Math.log(B1)); // for base B1
+   console.log(`the exponent ${ex}`);
+   console.log(`constant e ${E}`);
+   console.log(`the superlogB1 of e ${eAt}`);
+   // B1 ** E ~ B1 ^^ (slogB1(E) + 1) ~ B1 ^^ (1615 + 1)
+   // E ~ E ^^ (slogE(1) + 1)
+   // E ^^ (slogE(1) + 1) ~ B1 ^^ (slogB1(E) + 1) ~ B1 ^^ (1615 + 1)
+   document.write(`<p>${E} <sup>${eAt}</sup>${BASE} `);
+    
+</script>
+</body>
+</html>

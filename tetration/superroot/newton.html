@@ -1,0 +1,33 @@
+<html>
+<body>
+<h1>square super root</h1>
+<h3>by Newton's method</h3>
+<script>
+	a = 8;
+	iteration = 0;
+	guess = 1;
+	check = guess;
+	difference = Math.abs(a - (guess ** guess));
+	exactness = 1e-4;
+	
+	while (difference > exactness && iteration < 100) {
+	  guess = check;
+	  guess2 = guess ** guess;
+	  derivative = guess2 * (Math.log(guess) + 1);
+      check = guess - ((guess2 - a)/derivative);      
+      difference = Math.abs(a - (guess ** guess));
+      ++iteration; 		
+	}
+	
+	console.log('end');	
+	console.log(iteration);
+	
+	
+</script>
+<script>
+	rounded = Math.floor(guess * 1e4)/1e4;
+	document.write(`<p>square super root of ${a} is around ${rounded}</p>`);
+	document.write(`<p>preliminary result by ${iteration} iterations</p>`);
+</script>
+</body>
+</html>

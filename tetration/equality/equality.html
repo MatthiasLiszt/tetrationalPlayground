@@ -1,0 +1,42 @@
+<html>
+<body>
+	<h1>solutions to <sup>n</sup>b = b<sup>n</sup></h1>
+<script>
+	e = Math.E;
+	end = e ** (1/e); 
+	max = 20;
+	
+	function tet(x, n) {
+	  let h = x;	
+	  for(j = 1;j < n; ++j)	{
+		  h = x ** h;  
+	  } 
+	  return h;
+	}
+	N = 3;
+	tolerance = 0.01;
+	//document.write(`<p> b<sup>2</sup> = <sup>2</sup>b ~ 2</p>`);
+	w = 0;
+	step = 1e-4;
+	minStep = 1e-5;
+	solutions = [];
+	solutions.push(2);
+	for(i = 2; i > end && N < max;i-=step){
+		diff = Math.abs((i**N) - tet(i,N));
+		if (diff < tolerance) {
+			console.log(`${N} ${i} d ${diff} step ${step}`);
+			step = step > minStep ? step*0.1 : step;
+			solutions.push(i);
+			++N;
+		}
+		if(w%1000){console.log('.')};
+		++w;
+	}
+	N = 2;
+	for (let solution of solutions) {
+	  document.write(`<p> b<sup>${N}</sup> = <sup>${N}</sup>b ~ ${solution}</p>`);
+	  ++N;
+	}  
+</script>	
+</body>
+</html>

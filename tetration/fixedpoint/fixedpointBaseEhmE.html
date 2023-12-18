@@ -1,0 +1,23 @@
+<html>
+<h1>fixed points in exponentiation base e<sup>1/e</sup></h1>
+<script>
+   fixedpoints = [];
+   E = Math.E;
+   b = E ** (1/E);
+   previous = b;
+   exactness = 0.000001;
+   	 
+   for(let i = 2; i < 3; i+=1e-4) {
+	 approx = b ** i;
+	 difference = Math.abs(i-approx);
+	 if (difference < exactness) {
+	   fixedpoints.push(i);	 
+	 }
+   }
+   console.log('end');
+   
+   document.write(`<br><p>${fixedpoints.length} found between 2 and 3 </p>`);
+   document.write(`<p>fixedpoint at ${fixedpoints[0]}</p>`);
+
+</script>
+</html>

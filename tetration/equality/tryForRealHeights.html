@@ -1,0 +1,143 @@
+<html>
+<body>
+<h1>using it for real heights</h1>
+<script>
+      e = Math.E;
+      lmb = e**(1/e);
+      function quadProx(base, h) {
+         lB = Math.log(base);	  
+         part1 = (2 * lB / (1 + lB)) * (h-1);
+         part2 = ((1-lB)/(1+lB)) * (h-1) * (h-1);
+         return base ** (1 + part1 - part2);	  
+      }	
+</script>
+<script>
+   function getLinear(base) {
+     let guess = 2;
+     let step = 1;
+     let diff = 2;
+     let it = 0;
+     tolerance = 1e-3;
+     do {
+	t = linTet(base, guess -1);
+	diff = Math.abs(t - guess);
+	guess = t < guess ? guess + step : guess;
+	guess = t > guess ? guess - step : guess;
+	step = t > guess ? step * 0.5 : step;
+	++it; 
+     } while (diff > tolerance && it < 100);      
+     return guess;
+   }
+   
+   function getQuad(base) {
+     let guess = 2;
+     let step = 1;
+     let diff = 2;
+     let it = 0;
+     tolerance = 1e-3;
+     do {
+	t = quadTet(base, guess -1);
+	diff = Math.abs(t - guess);
+	guess = t < guess ? guess + step : guess;
+	guess = t > guess ? guess - step : guess;
+	step = t > guess ? step * 0.5 : step;
+	++it; 
+     } while (diff > tolerance && it < 100);      
+     return guess;
+   }
+   
+   function linTet(base, h) {
+     const int = Math.floor(h);
+     const fract = h%int;
+     let c = base ** fract;
+     let value = 0;
+     for (let i = 0;i < int; ++i) {
+       value = base ** c;
+       c = value;
+     } 
+     return value;
+   }
+   
+   function quadTet(base, h) {
+     const int = Math.floor(h);
+     const fract = h%int;
+     let c = quadProx(base, fract);
+     let value = 0;
+     for (let i = 0;i < int; ++i) {
+       value = base ** c;
+       c = value;
+     } 
+     return value;
+   }
+   
+   let results = [];
+   const start = 1.5;
+   for (let i = start;i >= 1.45; i-=0.01) {
+      const C = 3.238990951;
+      const d = i - lmb;
+      const predicted = ((1/d)**0.5)*C*((1-d)**0.5)-lmb**0.5;
+      results.push(predicted);
+   }
+   let N = start;
+   for (let result of results) {
+     const rounded = Math.floor(result*1000)/1000;
+     const linear = Math.floor(getLinear(N)*1000)/1000;
+     const quadratic = Math.floor(getQuad(N)*1000)/1000;
+     document.write(`<p><sup>${rounded}</sup>${N} ~ ${N}<sup>${rounded}</sup> linear ${linear} quadratic ${quadratic}</p>`);
+     N-=0.01;
+   }  
+</script>
+<h3>extension to heights between 2 and 1</h3>
+<script>
+
+   function getHighLinear(base) {
+     let guess = 2;
+     let step = 0.1;
+     let diff = 2;
+     let it = 0;
+     tolerance = 1e-6;
+     do {
+	t = base ** (guess - 1);
+	diff = Math.abs(t - guess);
+	//console.log(`t ${t} g ${guess} diff ${diff} step ${step}`);
+	guess = t > guess ? guess - step : guess;
+	//if (t<guess) console.log(`t < guess ${t} ${guess}`);
+	step = t < guess ? step * 0.5 : step;
+	guess = t < guess ? guess + 2 * step : guess;
+	step = guess <= 1 ? step * 0.5 : step;
+	guess = guess <= 1 ? guess + step : guess;
+	++it; 
+     } while (diff > tolerance && it < 1e2); 
+     console.log(`iterations ${it} step ${step}`);     
+     return guess;
+   }
+   
+   function getHighQuad(base) {
+     let guess = 2;
+     let step = 0.05;
+     let diff = 2;
+     let it = 0;
+     tolerance = 1e-12;
+     do {
+	t = quadProx(base, guess - 1);
+	diff = Math.abs(t - guess);
+	guess = t > guess ? guess - step : guess;
+	step = t < guess ? step * 0.5 : step;
+	guess = t < guess ? guess + 2 * step : guess;
+	step = guess <= 1 ? step * 0.5 : step;
+	guess = guess <= 1 ? guess + step : guess;
+	++it; 
+     } while (diff > tolerance && it < 100);      
+     return guess;
+   }
+   
+   const nearE = 2.718;
+   for (let i=nearE-0.2;i<=nearE;i+=0.1) {
+     const linear = Math.floor(getHighLinear(i)*1e6)/1e6;
+     const quadratic = Math.floor(getHighQuad(i)*1e6)/1e6;
+     const base = Math.floor(i * 1e5)/1e5;
+     document.write(`<p>base: ${base} linear ${linear} quadratic ${quadratic}</p>`)
+   }
+</script>
+</body>
+</html>
