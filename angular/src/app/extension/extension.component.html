@@ -1,0 +1,17 @@
+<div class="content">
+<h3>using it for real heights</h3>
+
+<ul>
+  <li *ngFor="let base of bases">
+    <sup>{{round(predict(base))}}</sup>{{base}} linear {{round(getLinear(base))}} quadratic {{round(getQuad(base))}}
+  </li>
+</ul>
+
+<h3>extension to heights between 2 and 1</h3>
+
+<ul>
+  <li *ngFor="let base of nearE">
+    base: {{base}} linear {{getHighLinear(base)}} quadratic {{getHighQuad(base)}}
+  </li>
+</ul>
+</div>

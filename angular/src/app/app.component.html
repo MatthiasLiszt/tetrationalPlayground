@@ -1,0 +1,31 @@
+
+<style>
+  @media screen and (max-width: 650px) {
+    .content {
+      flex-direction: column;
+      width: max-content;
+    }
+  } 
+  
+  .content {
+    margin: 5em;
+  }
+
+  h1 {
+    text-align: center;
+  }
+</style>
+
+<main class="main">
+  <div class="content">
+    <h1>{{ title }}</h1>
+    <h3>Contents</h3>
+    <ul>
+      <li><a href='/equality'>Equality <sup>h-1</sup>b = h</a></li>
+      <li><a href='/extension'>Extension to real heights</a></li>
+      <li><a href='/graph'>Graph and Representation on Complex Plane</a></li>
+    </ul>
+  </div>
+</main>
+
+<router-outlet></router-outlet>
