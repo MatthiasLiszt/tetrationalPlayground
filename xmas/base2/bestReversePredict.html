@@ -1,0 +1,276 @@
+<html>
+<body>
+<h1><sup>h</sup>b = b<sup>h</sup> + c ~ <sup>h</sup>b = c</h1>
+<script>
+function tellBase(height, variation) {
+  let digit = 16;  
+  const match = 1e-6;
+  let iteration = 0;
+  let b = digit;
+  do {
+    let x = variation;
+    let y = tet(b, height);  
+    if ( Math.abs(1 - (x/y)) < match || Math.abs(x/y -1) < match){  
+     return b;       
+    } else {
+      b = (y > x) ? b - digit : b + digit;
+      digit *= 0.5;     
+    }      
+    ++iteration;    
+   } while(iteration < 1e2);
+   return undefined;
+}
+    
+function findHeight(base, variation) {
+  const match = 1e-6;
+  let iteration = 0; 
+  let digit = 4;  
+  let h = digit;   
+  do {
+    let y = tellBase(h, variation);  
+    if ( Math.abs(1 - (base/y)) < match || Math.abs(base/y -1) < match){  
+     return h;       
+    } else {
+      h = (base > y) ? h - digit : h + digit;
+      digit *= 0.5;  
+    }      
+    ++iteration;    
+   } while(iteration < 1e2);
+   return undefined;    
+}    
+</script>    
+<script>
+var differences = [];
+var e = Math.E;  
+var match = 1e-4;    
+    
+function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x < 0) return undefined;  
+  if (x !== Math.floor(x)) {
+    const rest = x - Math.floor(x);
+    C = b ** rest;   
+  }  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+} 
+
+const c = tet(2.1, 4);
+let b = 16;
+let h = 2;
+const bases = [];
+let Bases = [];    
+
+let iteration = 0;
+let step = 16;    
+do {
+  let x = c; 
+  let y = tet(b, h);  
+  if ( Math.abs(1 - (x/y)) < match || Math.abs(x/y -1) < match){
+    bases.push(b);  
+    ++h;  
+    step = 16;  
+  } else {
+    b = (y > x) ? b - step : b + step;  
+    step *= 0.5;  
+  }      
+  ++iteration;    
+} while(iteration < 1e4);
+    
+var input = [];
+for (let i = 5; i < 96; ++i) {
+  input.push(i);
+}
+Bases = bases.slice(3);    
+    
+//calculate Newton coefficients
+var newton = [];
+var backup = [];
+var best = {score: 0, poly: 63, prediction: 0};
+
+for (let poly = 3; poly < 45; ++poly) {    
+  newton.push(Bases);
+  for(let j = 1;j < poly; ++j){
+    var current = newton[j - 1];
+    var next = [];
+    for(let i = 0;i < (current.length - 1); ++i){
+	  var pa = current[i];
+	  var pb = current[i + 1]; 
+	  var value = (pb - pa)/(input[j]-input[0]);
+	  next.push(value);
+    }
+    newton.push(next);
+  }  
+  const reversepredict = reversePredict(poly, newton, bases[1]);  
+  const ch = approximate(4, poly, newton);
+  console.log(`${poly} polynominals ${reversepredict*100} % predicted`);  
+  console.log(`${ch}`);
+  
+  if (reversepredict > best.score) {
+    best.score = reversepredict;
+    best.poly = poly;
+    best.prediction = ch;   
+    backup = JSON.parse(JSON.stringify(newton));  
+  }
+  newton = [];  
+}    
+
+function reversePredict(poly, tables, goal){
+  const a = approximate(4, poly, tables);   
+  return a > goal ? goal / a : a / goal;
+}    
+    
+//calculate values from formula
+var approx = [];
+for (let n of input) {    
+  var value = approximate(n, backup);
+  approx.push(value);  
+} 
+
+function approximate(y, poly, tables){
+  var value = 0;    
+  for(let i=0;i < poly; ++i) {
+    var xValue = 1;
+    for(let x = 0;x < i;++x) {
+      xValue *= (y - input[x]);  
+    } 
+    value += tables[i][0] * xValue;  
+  }
+  return value;  
+}
+
+// results
+const matching = bases[2] > best.prediction ? best.prediction/bases[2]*100 : bases[2]/best.prediction*100;
+document.write(`<p>best approximation with ${best.poly} polynominals --- where c = ${c}</p>`);    
+document.write(`<p> missing value ${bases[2]} best prediction ${best.prediction} --- ${matching} % match`);
+</script> 
+<script>
+const throughTwo = findHeight(2, c);
+const foundTwo = findTwo(best.poly, backup);    
+document.write(`<p>predicted <sup>${foundTwo}</sup>2 but should be <sup>${throughTwo}</sup>2 </p>`);     
+function findTwo(poly, tables){
+  let suppose = 4;   
+  let iteration = 0;
+  let digit = 0.5;  
+  let step = digit;  
+  do {
+    const a = approximate(suppose + step, poly, tables);
+    step = a < 2 ? step - digit : step + digit;
+    digit *= 0.5;  
+    ++iteration;   
+  } while(iteration < 100);  
+  return suppose + step;    
+}    
+</script>    
+<script>    
+document.write(`<p>red = approximation with ${best.poly} polynominals , blue = equation results</p>`);    
+</script>
+<canvas id="graph" width=320 height=200 style="border:1px solid black;"></canvas>
+<script>
+const canvas=document.getElementById("graph");
+const context = canvas.getContext('2d');
+const scale = 16;        
+context.strokeStyle ='red';    
+for(let i = 2; i < 30; i+=0.02){
+  const y = approximate(i, best.poly, backup);  
+  context.strokeRect(i*scale, 200-y*scale, 1, 1);  
+}
+    
+context.strokeStyle ='blue';    
+for(let i = 2; i < 30; i+=0.2){
+  const y = bases[Math.floor(i-2)];  
+  context.strokeRect(i*scale, 200-y*scale, 1, 1);  
+}  
+</script>
+<script>   
+// calculating approximation from result
+const bValue = foundTwo - 4;
+const lg2 = (x) => Math.log(x)/Math.log(2);
+const bResult = lg2(lg2(lg2(lg2(c))));    
+input = [0];    
+const table = [1];
+let exp = bValue;
+let res = bResult;    
+do {
+  input.push(exp);
+  table.push(res);   
+  exp += bValue;
+  res *= bResult;   
+} while(exp < 1);
+
+const curve = [];
+curve.push(table);
+const maxPoly = 4;    
+for(let j = 1;j < maxPoly; ++j){
+  var current = curve[j - 1];
+  var next = [];
+  for(let i = 0;i < (current.length - 1); ++i){
+	var pa = current[i];
+	var pb = current[i + 1]; 
+	var value = (pb - pa)/(input[j]-input[0]);
+	next.push(value);
+  }
+  curve.push(next);
+}      
+</script>
+<script>    
+document.write(`<p>red = approximation with ${maxPoly} polynominals , blue = 2<sup>x</sup>, green = quadratic approximation</p>`);    
+</script>
+<canvas id="graph2" width=320 height=200 style="border:1px solid black;"></canvas>
+<script>
+const canvas2=document.getElementById("graph2");
+const context2 = canvas2.getContext('2d');
+const scale2 = 100;        
+context2.strokeStyle ='red';    
+for(let i = 0; i < 1; i+=0.01){
+  const y = approximate(i, maxPoly, curve);  
+  context2.strokeRect(i*scale2, 200-(y-1)*scale2, 1, 1);  
+}
+    
+context2.strokeStyle ='blue';    
+for(let i = 0; i < 1; i+=0.05){
+  const y = 2**i;  
+  context2.strokeRect(i*scale2, 200-(y-1)*scale2, 3, 1);  
+}
+
+context2.strokeStyle ='green';
+const ld = Math.log(2);    
+const c1 = 2 * ld / (1 + ld);
+const c2 = (1 - ld) / (1 + ld);    
+for(let i = 0; i < 1; i+=0.05){
+  const h = 1 + c1*(i-1) - c2*(i-1)*(i-1);  
+  const y = 2**h;  
+  context2.strokeRect(i*scale2, 200-(y-1)*scale2, 3, 1);  
+}    
+</script>
+<script>        
+//print formula
+var formula = [];    
+for (let i=0;i < maxPoly; ++i){
+  var value = [];  
+  for(let x = 0;x < i;++x) {
+    var op = input[x] < 0 ? '+' : '-';  
+    value.push(`(x ${op} ${Math.abs(input[x])})`);  
+  } 
+  formula.push(`${curve[i][0]} ${value.join('')}`);  
+}    
+document.write('<p>'+formula.join('+')+' =</p>');    
+let xs = curve[1][0];        
+document.write(`<p> 1 + ${xs} x + ${formula[2]} + ${formula[3]} =</p>`);
+xs = xs - curve[2][0] * input[1];
+let x2s = curve[2][0];    
+document.write(`<p> 1 + ${xs} x + ${x2s} x² + ${formula[3]} =</p>`);
+const cf = curve[3][0];    
+const w2 = input[2];
+const w1 = input[1];   
+const w3 = w1 * w2;    
+document.write(`<p> 1 + ${xs} x + ${x2s} x² + ${cf}(x³ - ${w2}x² - ${w1}x² + ${w3})  =</p>`); 
+document.write(`<p> 1 + ${xs} x + ${x2s} x² + ${cf}(x³ - ${w2+w1}x² + ${w3}x)  =</p>`);
+document.write(`<p> 1 + ${xs} x + ${x2s} x² + ${cf}x³ - ${cf*(w2+w1)}x² + ${cf*w3}x  =</p>`);
+document.write(`<p> 1 + ${xs + cf*w3} x + ${x2s - cf*(w2+w1)} x² + ${cf}x³ </p>`);    
+</script>    
+</body>
+</html>

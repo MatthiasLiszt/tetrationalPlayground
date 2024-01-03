@@ -1,0 +1,57 @@
+<html>
+<body>
+<h1>finite differences of tetration base 1.45</h1>
+<script>
+var differences = [];
+var BASE = 1.45;
+var maxPoly = 41;    
+    
+function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x < 0) return undefined;  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+}
+
+var tetris = [];
+for(let i = 0; i < 43; ++i){
+  tetris.push(tet(BASE, i));
+}
+
+differences.push(tetris);
+for(let j = 1;j < maxPoly; ++j){
+  var current = differences[j - 1];
+  var next = [];
+  for(let i = 0;i < (current.length - 1); ++i){
+	var a = current[i];
+	var b = current[i + 1]; 
+	var value = b - a;
+	next.push(value);
+  }
+  differences.push(next);
+}
+
+//reproduce origin
+var reproduce = [];
+var diff = [];
+
+for (let i=1; i < maxPoly; ++i) {
+  diff.push(differences[i][0]);
+}
+
+reproduce.push(differences[0][0]);
+var next = reproduce[0];
+for(let i=0; i < 41; ++i){
+  next = next + diff[0];
+  reproduce.push(next);	
+  for(let j = 0; j < (maxPoly - 2); ++j) {
+	diff[j] += diff[j + 1]; 
+  }
+}
+
+</script>
+</body>
+</html>

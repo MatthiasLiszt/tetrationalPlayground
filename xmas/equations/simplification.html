@@ -1,0 +1,88 @@
+<html>
+<body>
+<h1><sup>h</sup>b = b<sup>h</sup> + c ~ <sup>h</sup>b = c</h1>
+<script>
+var differences = [];
+var e = Math.E;  
+var maxPoly = 8;    
+    
+function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x < 0) return undefined;  
+  if (x !== Math.floor(x)) {
+    const rest = x - Math.floor(x);
+    C = b ** rest;   
+  }  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+}    
+
+
+//const c = tet(10, 2) - 10**2;    
+const c = 10**10;
+
+const var1 = [];
+const var2 = [];
+const var3 = [];
+const var4 = [];
+const var5 = [];
+const var6 = [];    
+    
+function tellBase(height, variation) {
+  let b = 10;  
+  const match = 0.0001;
+  let iteration = 0;
+  let step = 1e-7;  
+  do {
+    let x = variation;
+    let y = tet(b, height);  
+    if ( Math.abs(1 - (x/y)) < match || Math.abs(x/y -1) < match){  
+     return b;       
+    } else {
+      b = (x > y) ? b + step : b;
+      b = (y > x) ? b - step : b;
+      step = (y > x) ? step * 1.1 : step;
+      step = (x > y) ? 1e-7 : step;  
+    }      
+    ++iteration;    
+   } while(iteration < 1e3);
+   return undefined;
+}      
+
+document.write(`<h3>........ ${c} ${2*c} ${3*c} ${c}² 100<sup>100</sup> 143<sup>143</sup></h3>`);    
+for (i = 3;i < 13; ++i) {
+  var1.push(tellBase(i, c));
+  var2.push(tellBase(i, 2 * c));
+  var3.push(tellBase(i, 3 * c));
+  var4.push(tellBase(i, c * c));
+  var5.push(tellBase(i, 100 ** 100));
+  var6.push(tellBase(i, 143 ** 143));  
+  document.write(`<p>   h = ${i}   | ${var1[i-3]} ${var2[i-3]} ${var3[i-3]} ${var4[i-3]} ${var5[i-3]} ${var6[i-3]}</p>`);  
+}  
+
+function findHeight(base, variation) {
+  const match = 0.0001;
+  let iteration = 0;
+  const minStep = 1e-9;  
+  let step = minStep;  
+  let h = 3;   
+  do {
+    let y = tellBase(h, variation);  
+    if ( Math.abs(1 - (base/y)) < match || Math.abs(base/y -1) < match){  
+     return h;       
+    } else {
+      h = (base > y) ? h - step : h;
+      h = (y > base) ? h + step : h;
+      step = (y > base) ? step * 1.1 : step;
+      step = (base > y) ? minStep : step;  
+    }      
+    ++iteration;    
+   } while(iteration < 1e4);
+   return undefined;    
+}    
+</script>
+</body>
+</html>

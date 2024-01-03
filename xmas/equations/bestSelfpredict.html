@@ -1,0 +1,122 @@
+<html>
+<body>
+<h1><sup>h</sup>b = b<sup>h</sup> + c ~ <sup>h</sup>b = c</h1>
+<script>
+var differences = [];
+var e = Math.E;  
+var match = 1e-4;    
+    
+function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x < 0) return undefined;  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+}    
+
+
+const c = tet(10, 2);
+let b = 16;
+let h = 2;
+const bases = [];    
+
+let iteration = 0;
+let step = 16;    
+do {
+  let x = c; 
+  let y = tet(b, h);  
+  if ( Math.abs(1 - (x/y)) < match || Math.abs(x/y -1) < match){
+    bases.push(b);  
+    ++h;  
+    step = 16;  
+  } else {
+    b = (y > x) ? b - step : b + step;  
+    step *= 0.5;  
+  }      
+  ++iteration;    
+} while(iteration < 1e4);
+    
+var input = [];
+for (let i = 2; i < 96; ++i) {
+  input.push(i);
+}
+
+//calculate Newton coefficients
+var newton = [];
+var backup = [];
+var best = {follows: -12, poly: 63};
+
+for (let poly = 3; poly < 81; ++poly) {    
+  newton.push(bases);
+  for(let j = 1;j < poly; ++j){
+    var current = newton[j - 1];
+    var next = [];
+    for(let i = 0;i < (current.length - 1); ++i){
+	  var pa = current[i];
+	  var pb = current[i + 1]; 
+	  var value = (pb - pa)/(input[j]-input[0]);
+	  next.push(value);
+    }
+    newton.push(next);
+  }  
+  const selfpredict = selfPredict(poly, newton);  
+  console.log(`${poly} polynominals ${selfpredict} follows`);
+  const ch1 = approximate(poly -1 , poly, newton);
+  const ch2 = approximate(poly , poly, newton);
+  const ch3 = approximate(poly + 1, poly, newton);
+  const ch4 = approximate(poly + 2, poly, newton);  
+  console.log(`${ch2} °${bases[poly-2]} ${ch3} °${bases[poly-1]} ${ch4} °${bases[poly]}`);  
+  if (selfpredict > best.follows) {
+    best.follows = selfpredict;
+    best.poly = poly;
+    backup = JSON.parse(JSON.stringify(newton));  
+  }
+  newton = [];  
+}    
+
+function selfPredict(poly, tables){
+  const pointmatch = 0.1;
+  let score = 0;  
+  let i = 2;  
+  let stop = false;  
+  for(let k = 0; k < bases.length; ++k) {
+    const a = approximate(i, poly, tables);
+    const one = bases[k];   
+    if (a < (1 + pointmatch) * one && a > (1 - pointmatch) * one && !stop) {
+      ++score;   
+    }  else {
+      stop = true;  
+    }
+    ++i;  
+  }  
+  return (score - poly);
+}    
+    
+//calculate values from formula
+var approx = [];
+for (let n of input) {    
+  var value = approximate(n, backup);
+  approx.push(value);  
+} 
+
+function approximate(y, poly, tables){
+  var value = 0;    
+  for(let i=0;i < poly; ++i) {
+    var xValue = 1;
+    for(let x = 0;x < i;++x) {
+      xValue *= (y - input[x]);  
+    } 
+    value += tables[i][0] * xValue;  
+  }
+  return value;  
+}
+
+// results
+document.write(`<p>best approximation with ${best.poly} polynominals </p>`);
+document.write(`<p>best approximation score ${best.follows} --- number of predicted follows </p>`);    
+</script>
+    
+</body>
+</html>

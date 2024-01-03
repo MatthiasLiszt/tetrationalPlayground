@@ -1,0 +1,112 @@
+<html>
+<body>
+<h1>approximating tetration base e with piecewise values</h1>
+<script>
+var differences = [];
+var e = Math.E;
+var maxPoly = 4;
+var step = 0.25;    
+
+function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x < 0) return undefined;  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+}    
+
+var tetris = [];
+for(let i = 0; i <= 3; i += step){
+  if (i == Math.floor(i)) {  
+    tetris.push(tet(e, i));
+  } else {
+    var n = Math.floor(i);  
+    var C = e ** (i-n);
+    for (let j = 1; j <= n; ++j) {
+      C = e ** C;  
+    } 
+    tetris.push(C);  
+  }    
+}
+
+//calculate Newton coefficients
+
+var newton = [];
+    
+newton.push(tetris);
+for(let j = 1;j < maxPoly; ++j){
+  var current = newton[j - 1];
+  var next = [];
+  for(let i = 0;i < (current.length - 1); ++i){
+	var a = current[i];
+	var b = current[i + 1]; 
+	var value = (b - a)/(j*step);
+	next.push(value);
+  }
+  newton.push(next);
+}
+
+//print formula
+var formula = [] ;    
+for (let i=0;i < maxPoly; ++i){
+  var value = [];  
+  for(let x=0;x < i;++x) {
+    value.push(`(x - ${x * step})`);  
+  } 
+  formula.push(`${newton[i][0]} ${value.join('')}`);  
+}    
+document.write('<p>'+formula.join('+')+'</p>')    
+
+//calculate values from formula
+var approx = [];    
+for(let i=0;i <= 3; i+=step) {
+  var value = 0;  
+  for (let j=0;j < maxPoly; ++j){
+    var xValue = 1;
+    for(let x=0;x < j;++x) {
+      xValue *= (i - x * step);  
+    }   
+    value += newton[j][0] * xValue;  
+  }  
+  approx.push(value);  
+}    
+
+function approximate(y) {
+  var value = 0;  
+  for (let j=0;j < maxPoly; ++j){
+    var xValue = 1;
+    for(let x=0;x < j;++x) {
+      xValue *= (y - x * step);  
+    }   
+    value += newton[j][0] * xValue;  
+  }
+  return value;  
+}      
+</script>
+<script>    
+document.write(`<p>red = approximation with ${maxPoly} polynominals , blue = exponential function</p>`);    
+</script>    
+<canvas id="graph" width=320 height=200 style="border:1px solid black;"></canvas>
+<script>
+const canvas=document.getElementById("graph");
+const context = canvas.getContext('2d');
+const scale = 100;    
+//context.strokeStyle = 'black';
+//context.strokeRect(160, 0, 1, 200);
+//context.strokeRect(0, 100, 320, 0);    
+context.strokeStyle ='red';    
+for(let i = 0; i < 1.2; i+=0.01){
+  const y = approximate(i);  
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
+}
+    
+context.strokeStyle ='blue';    
+for(let i = 0; i < 1.2; i+=0.01){
+  const y = e**i;  
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
+}  
+</script>    
+</body>
+</html>

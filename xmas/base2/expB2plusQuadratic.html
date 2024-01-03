@@ -1,0 +1,32 @@
+<html>
+<body>
+<h1>2<sup>x</sup> and quadratic approximation</h1>
+    
+<script>    
+document.write(`<p>blue = 2<sup>x</sup>, green = quadratic approximation for tetration base 2</p>`);    
+</script>
+<canvas id="graph" width=320 height=200 style="border:1px solid black;"></canvas>
+<script>
+const canvas=document.getElementById("graph");
+const context = canvas.getContext('2d');
+const scale = 100;        
+context.strokeStyle ='blue';    
+for(let i = 0.1; i < 1; i+=0.02){
+  const y = 2**i;   
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
+}
+    
+context.strokeStyle ='green';
+const ld = Math.log(2);    
+const c1 = 2 * ld / (1 + ld);
+const c2 = (1 - ld) / (1 + ld);
+console.log(`c1 = ${c1} , c2 = ${c2}`);    
+for(let i = 0; i < 1; i+=0.02){
+  const h = 1 + c1*(i-1) - c2*(i-1)*(i-1);  
+  const y = 2**h;  
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1); 
+  //console.log(`${i} ${h}`);  
+}  
+</script>    
+</body>
+</html>

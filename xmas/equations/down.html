@@ -1,0 +1,107 @@
+<html>
+<body>
+<h1><sup>h</sup>b = b<sup>h</sup> + c</h1>
+<script>
+var differences = [];
+var e = Math.E;  
+var match = 0.0001;
+var maxPoly = 15;    
+    
+function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x < 0) return undefined;  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+}    
+
+
+const c = tet(10, 2) - 10**2;
+// const c = tet(2, 3) - 2**3;
+//const c = tet(3, 3) - 3**3;    
+let b = 10;
+let h = 2;
+const bases = [];    
+
+let iteration = 0;
+let step = 1e-7;    
+do {
+  let x = b ** h + c; 
+  let y = tet(b, h);  
+  if ( Math.abs(1 - (x/y)) < match || Math.abs(x/y -1) < match){
+    document.write(`<p>${b}<sup>${h}</sup> + ${c}</p>`);
+    bases.push(b);  
+    ++h;  
+    step = 1e-7;       
+  } else {
+    b = (x > y) ? b + step : b;
+    b = (y > x) ? b - step : b;
+    step = (y > x) ? step * 1.03 : step;
+    step = (x > y) ? 1e-7 : step;  
+  }      
+  ++iteration;    
+} while(iteration < 1e5);
+
+const predictions = [];
+const lm = e**(1/e);    
+for (let i=0; i < 12; ++i){
+  predictions.push(predict(bases[i]));  
+}    
+
+function predict(y) {
+  const c = 3.23;
+  const d = y - e**(1/e);
+  const w = d**-0.5;    
+  return w * c;  
+}
+    
+var input = [];
+for (let i = 2; i < 64; ++i) {
+  input.push(i);
+}    
+
+//calculate Newton coefficients
+var newton = [];
+    
+newton.push(bases);
+for(let j = 1;j < maxPoly; ++j){
+  var current = newton[j - 1];
+  var next = [];
+  for(let i = 0;i < (current.length - 1); ++i){
+	var pa = current[i];
+	var pb = current[i + 1]; 
+	var value = (pb - pa)/(input[j]-input[0]);
+	next.push(value);
+  }
+  newton.push(next);
+}
+    
+//calculate values from formula
+var approx = [];
+for (let n of input) {    
+  var value = approximate(n);
+  approx.push(value);  
+} 
+
+function approximate(y){
+  var value = 0;    
+  for(let i=0;i < maxPoly; ++i) {
+    var xValue = 1;
+    for(let x = 0;x < i;++x) {
+      xValue *= (y - input[x]);  
+    } 
+    value += newton[i][0] * xValue;  
+  }
+  return value;  
+}
+
+console.log(`e = ${e}  approximate(3.09736) = ${approximate(3.09736)}`);
+console.log(`e = ${e}  approximate(3.113) = ${approximate(3.113)} ~e with 14 polynominals`);
+console.log(`e = ${e}  approximate(3.1228) = ${approximate(3.1228)} ~e with 32 polynominals`);    
+console.log(`e**e**e**e**0.133783238-10**10 = ${e**e**e**e**0.133783238-10**10}`);    
+console.log(`e = ${e}  approximate(3.133783238) = ${approximate(3.133783238)} ~e with ${maxPoly} polynominals`);    
+</script>
+</body>
+</html>
