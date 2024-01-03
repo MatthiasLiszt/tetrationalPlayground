@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>introduction to tetration with real heights</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+<h1><sup>h</sup>b &asymp; c or how to calculate tetration with real heights</h1>
+<p>
+As it is quite easy to calculate integer solutions for $\;^hb = b^h $ the question arose on how to find a solution for real heights.
+One idea was of predicting the height by finding a formula approximating it. For more on that specific equation see <a href="https://math.stackexchange.com/questions/4815905/might-results-which-show-the-same-result-for-tetration-as-for-exponentiation-be">discussion on Math.stackexchange</a>. However this just gives probably just one solution for one base between 2 and $e^(1/e) $ and so I thought of changing it to $\;^hb = b^h0 + c $ which can just be approximated or simplified to $\; ^hb \sim c$ .  
+</p>
+<p>
+I tried with different constants and decided to use Newton's divided differences interpolation polynomial method to get a good approximation
+for the desired interval as predicting the whole series of solutions from 2 to infinity with some self-made formula seemed to be hopeless as it would never be exact enough -- especially for lower heights. It turned out it just needed to be pretty good in the range from 3 to 4 for base e and 4 to 5 in for base 2. I tried with different numbers of polynominals and different constants.
+</p>
+<p>
+Of interested was just the non-integer or fractional value due to the unique property of tetration where $\; (^ba) ^ (^ca) = (^(c+1)a) ^ (^(b-1)a)$.
+From this can be concluded that from a tetrational height x between 0 and 1 all other heights n+x can be calculated where n is any integer greater than 0. 
+</p>
+<h3>Results</h3>
+<p>I used a constant c of $\;^4(2.1) $ ~ 84899120142.81 to predict the calculated value for $\;^4b = c $ and the best prediction was around 2.15 instead of the calculated 2.1000003814697266. Then I supposed it would behave like $2^x $ and used multiplication to get more values and then I used the Newton polynomial method to get an approximation and the result was the formula 1 + 0.6856427806944169 x + 0.22005174698143642 x² + 0.07447687052884291x³.   
+</p>
+<p>
+In a similar way I used different constants to get solutions for $\;^3b = c $ and from the results I used Newton polynomials to get a formula or function which approximates the exponential function which pretty good approximates $\;^xe $ for 0 > x < 1 . The result was 1 + 1.0432362881329733 x + 0.5910113778264401 x² .
+</p>
+Please take a look at <a href="https://github.com/MatthiasLiszt/tetrationalPlayground/">my repository on github</a> to see graphs and code. 
+</body>
+</html>
