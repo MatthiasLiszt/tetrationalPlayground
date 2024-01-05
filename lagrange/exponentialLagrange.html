@@ -1,0 +1,73 @@
+<html>
+<body>
+<h1>approximating the exponential function with Lagrange polynomials</h1>
+<script>
+var differences = [];
+var e = Math.E;
+var maxPoly = 3;    
+
+var expo = [];
+for(let i = 0; i < 21; ++i){
+  expo.push(e**i);
+}
+
+// calculate Lagrange polynomials
+// it's far less effort than Newton polynomials so this can actually be skipped and done in approximate
+var lagrange = expo;
+
+//calculate values from formula
+var approx = [];    
+for(let i=0;i < 9; i+=0.5) {
+  const value = approximate(i, maxPoly, lagrange);  
+  approx.push(value);  
+}  
+
+function approximate(y, poly, lagrange){
+  var value = 0;  
+  var lv = 1;
+  var index = 0;
+  for (let k = 0; k < poly; ++k) {
+    lv = 1;
+    for (let i = 0; i < poly; ++i) {
+      if (i !== index) {
+        lv *= (y - i) / (index - i);
+      }  
+    }
+    value += (lv * lagrange[index]);
+    ++index;
+  }  
+  return value;  
+} 
+   
+</script>
+<script>    
+document.write(`<p>red = approximation with ${maxPoly} polynominals , blue = exponential function green = linear</p>`);    
+</script>
+<canvas id="graph" width=320 height=200 style="border:1px solid black;"></canvas>
+<script>
+const canvas=document.getElementById("graph");
+const context = canvas.getContext('2d');
+const scale = 100;    
+context.strokeStyle = 'black';
+//context.strokeRect(160, 0, 1, 200);
+//context.strokeRect(0, 100, 320, 0);    
+context.strokeStyle ='red';    
+for(let i = 0; i < 1.2; i+=0.01){
+  const y = approximate(i, maxPoly, lagrange);  
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
+}
+    
+context.strokeStyle ='blue';    
+for(let i = 0; i < 1.2; i+=0.01){
+  const y = e**i;  
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
+}  
+
+context.strokeStyle ='green';    
+for(let i = 0; i < 1.2; i+=0.01){
+  const y = 1 + (e - 1) * i;  
+  context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
+}      
+</script>    
+</body>
+</html>

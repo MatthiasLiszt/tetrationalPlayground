@@ -12,5 +12,6 @@ Nearly all html files are standalone with js Code. So you could just load one in
 ## Directories
 
 * xmas ... solving <sup>h</sup>b ~ c for real exponents with  [Newton's divided differences interpolation polynomial method](https://en.wikipedia.org/wiki/Newton_polynomial)
+* lagrange ... parts of the stuff in xmas but with Lagrange polynomials
 * tetration ... early experiments with tetration in 2023
 * angular ... some Angular demo repo concerning tetration
