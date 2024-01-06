@@ -68,6 +68,67 @@ for(let i = 0; i < 1.2; i+=0.01){
   const y = 1 + (e - 1) * i;  
   context.strokeRect(i*scale, 200-(y-1)*scale, 1, 1);  
 }      
+</script>
+<script>
+// print formula
+function generateFormula(poly, lagrange){
+  var formula = [];  
+  var lv = [];
+  var index = 0;
+  var values = [];
+  for (let k = 0; k < poly; ++k) {
+    lv = [];
+    var next = [];
+    for (let i = 0; i < poly; ++i) {
+      if (i !== index) {
+        const dv = 1 / (index - i);
+        const p = `(${dv}) (x - ${i})`;
+        lv.push(p);
+        next.push(dv);
+        next.push(i);
+      }  
+    }
+    values.push(next);
+    formula.push(`(${lagrange[index]}) ${lv.join('')}`);
+    ++index;
+  }  
+  return {formula: formula, values: values};  
+}
+// 1.47625 x^2 + 0.242036 x + 1
+var formula = generateFormula(maxPoly, lagrange);
+
+document.write('<p>'+formula.formula.join('+')+' = </p>');
+
+function simplify3p(numbers, fv) {
+  const p = fv * numbers[0] * numbers[2];
+  let values = [];
+  let x2s = 1;
+  let xs = - numbers[3] - numbers[1];
+  let c = (- numbers[3]) * (- numbers[1]);
+  values.push(p * x2s);
+  values.push(p * xs);
+  values.push(p * c);
+  return {string: `(${p * x2s}) x² + (${p * xs}) x + (${p * c})`, values: values};
+}
+
+var simplify = [];
+var ix = 0;
+var x2s = 0;
+var xs = 0;
+var c = 0;
+for (let vw of formula.values) {
+  const result = simplify3p(vw,lagrange[ix]);
+  simplify.push(result.string);
+  x2s += result.values[0];
+  xs += result.values[1];
+  c += result.values[2];
+  ++ix;
+}
+
+document.write('<p>'+simplify.join('+')+' = </p>');
+const xpm = xs > 0 ? '+' : '';
+const cpm = c > 0 ? '+' : '';
+document.write(`<p>${x2s} x² ${xpm}${xs} x ${cpm}${c}</p>`);
 </script>    
 </body>
 </html>

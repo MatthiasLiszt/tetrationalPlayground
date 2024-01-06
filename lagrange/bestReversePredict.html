@@ -175,18 +175,18 @@ for(let i = 2; i < 30; i+=0.2){
 
 const bValue = foundE -3;
 const bResult = Math.log(Math.log(Math.log(c)));    
-input = [0];    
+input = [0];
 const table = [1];
 let exp = bValue;
-let res = bResult;    
+let res = bResult;
 do {
   input.push(exp);
-  table.push(res);   
+  table.push(res);
   exp += bValue;
-  res *= bResult;   
+  res *= bResult;
 } while(exp < 1);
 
-const maxPoly = 4;    
+const maxPoly = 4;
      
 </script>
 <script>    
@@ -209,6 +209,85 @@ for(let i = 0; i < 1; i+=0.05){
   context2.strokeRect(i*scale2, 200-(y-1)*scale2, 3, 1);  
 }  
 </script>
-    
+<script>
+  // print formula
+  function generateFormula(poly, lagrange){
+    var formula = [];  
+    var lv = [];
+    var index = 0;
+    var values = [];
+    for (let k = 0; k < poly; ++k) {
+      lv = [];
+      var next = [];
+      for (let i = 0; i < poly; ++i) {
+        if (i !== index) {
+          const dv = 1 / (index - i);
+          const p = `(${dv}) (x - ${i})`;
+          lv.push(p);
+          next.push(dv);
+          next.push(i);
+        }  
+      }
+      values.push(next);
+      formula.push(`(${lagrange[index]}) ${lv.join('')}`);
+      ++index;
+    }  
+    return {formula: formula, values: values};
+  }
+
+  var formula = generateFormula(maxPoly, table);
+  
+  document.write('<p>'+formula.formula.join('+')+' = </p>');
+  
+  function simplify3p(numbers, fv) {
+    const p = fv * numbers[0] * numbers[2];
+    let values = [];
+    let xs = [];
+    xs[2] = 1;
+    xs[1] = - numbers[3] - numbers[1];
+    xs[0] = (- numbers[3]) * (- numbers[1]);
+    values.push(p * xs[0]);
+    values.push(p * xs[1]);
+    values.push(p * xs[2]);
+    return {string: `(${p * xs[0]}) + (${p * xs[1]}) x + (${p * xs[2]}) x²`, values: values};
+  }
+
+  function simplify4p(numbers, fv) {
+    const p = fv * numbers[0] * numbers[2] + numbers[4];
+    let values = [];
+    let xs = [];
+    xs[3] = 1;
+    xs[2] = 1;
+    xs[1] = - numbers[3] - numbers[1];
+    xs[0] = (- numbers[3]) * (- numbers[1]);
+    xs[2] = (- numbers[5]) * xs[2] + xs[1];
+    xs[1] = (- numbers[5]) * xs[1] + xs[0];
+    xs[0] = (- numbers[5]) * xs[0];
+    values.push(p * xs[0]);
+    values.push(p * xs[1]);
+    values.push(p * xs[2]);
+    values.push(p * xs[3]);
+    return {string: `(${p * xs[0]}) + (${p * xs[1]}) x + (${p * xs[2]}) x² + (${p * xs[3]}) x³`, values: values};
+  }
+  
+  var simplify = [];
+  var ix = 0;
+  let xs = [0, 0, 0, 0];
+  for (let vw of formula.values) {
+    const result = simplify4p(vw, table[ix]);
+    simplify.push(result.string);
+    xs[3] += result.values[3];
+    xs[2] += result.values[2];
+    xs[1] += result.values[1];
+    xs[0] += result.values[0];
+    ++ix;
+  }
+  
+  document.write('<p>'+simplify.join('+')+' = </p>');
+  const x2pm = xs[2] > 0 ? '+' : '';
+  const xpm = xs[1] > 0 ? '+' : '';
+  const cpm = xs[0] > 0 ? '+' : '';
+  document.write(`<p>${xs[3]} x³ ${x2pm}${xs[2]} x² ${xpm}${xs[1]} x ${cpm}${xs[0]}</p>`);
+  </script>
 </body>
 </html>
