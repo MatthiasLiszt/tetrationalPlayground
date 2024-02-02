@@ -1,0 +1,368 @@
+<html>
+<body>
+<h1>approximating the tetration base e with Lagrange polynomials</h1>
+<script>
+  function tet(b, x){
+  let C = b;  
+  if (x == 0) return 1;
+  if (x == -1) return 0;
+  if (x < -1) return undefined; 
+  if (x < 0) return 1 + x; 
+  if (x !== Math.floor(x)) {
+    const rest = x - Math.floor(x);
+    C = b ** rest;   
+  }  
+  for(let i = 1;i < x; ++i) {
+    C = b ** C;   
+  }
+  return C;  
+}
+</script>
+<script>
+var differences = [];
+var e = Math.E; 
+
+//var input = [-1, -0.5, 0, 1, 2, 3];
+//var input = [-1, 0, 0.1, 0.2, 1, 1.1, 1.2, 2];
+var input = [-1, 0, 1, 2];
+var maxPoly = input.length - 1;
+
+let tetValues = [];
+tetValues.push(0)// 0
+// tetValues.push(0.5)// 0
+tetValues.push(1); // e^^0
+//tetValues.push(1.1);
+//tetValues.push(1.225316287892631);
+tetValues.push(e); // e^^1
+//tetValues.push(e**1.1);
+//tetValues.push(e**1.225316287892631);
+tetValues.push(e**e); // e^^2
+//tetValues.push(e**e**2.1); // e^^2
+//tetValues.push(e**e**e); // e^^3
+
+// calculate Lagrange polynomials
+// it's far less effort than Newton polynomials so this can actually be skipped and done in approximate
+var lagrange = tetValues;
+
+//calculate values from formula
+var approx = [];    
+for(let i=0;i < 3; i+=0.5) {
+  const value = approximate(i, maxPoly, lagrange, input);  
+  approx.push(value);  
+}  
+
+function approximate(y, poly, lagrange, input){
+  var value = 0;  
+  var lv = 1;
+  var index = 0;
+  for (let k = 0; k < poly; ++k) {
+    lv = 1;
+    for (let i = 0; i < poly; ++i) {
+      if (i !== index) {
+        lv *= (y - input[i]) / (input[index] - input[i]);
+      }  
+    }
+    value += (lv * lagrange[index]);
+    ++index;
+  }  
+  return value;  
+} 
+   
+</script>
+<script>
+// print formula
+function generateFormula(poly, lagrange){
+  var formula = [];  
+  var lv = [];
+  var index = 0;
+  var values = [];
+  for (let k = 0; k < poly; ++k) {
+    lv = [];
+    var next = [];
+    for (let i = 0; i < poly; ++i) {
+      if (i !== index) {
+        const dv = 1 / (index - i);
+        const p = `(${dv}) (x - ${i})`;
+        lv.push(p);
+        next.push(dv);
+        next.push(i);
+      }  
+    }
+    values.push(next);
+    formula.push(`(${lagrange[index]}) ${lv.join('')}`);
+    ++index;
+  }  
+  return {formula: formula, values: values};  
+}
+</script>
+<script>
+  function isContinous(start, end, poly, lagrange, input){
+    let i = start;
+    const step = 0.01;
+    let a = 0;
+    let b = 0;
+    do {
+      a = approximate(i, poly, lagrange, input);
+      i += step;
+      b = approximate(i, poly, lagrange, input);
+    } while (i < end && a < b);
+    i+step;
+    return a < b ? true : false;
+  }
+
+  let approxM1 = approximate(-1, maxPoly, lagrange, input);
+  let butshould = approxM1 != 0 ? 'but should be 0' : '';
+  document.write(`<p>at x = - 1 it is ${approxM1} ${butshould}</p>`);
+  document.write(`<p>is it continous ? ${isContinous(-1, 3, maxPoly, lagrange, input) ? 'yes' : 'no'}</p>`);
+</script>
+<script>
+  // evaluate
+  let id = 1;
+  let best = { at: 0.9, diff: 99};
+  let worst = { at: 0.9, diff: 0};
+  for (let n = 0.1; n < 0.9; n += 0.1) {
+    const at0oX = approximate(n, maxPoly, lagrange, input);
+    const at1oX = Math.log(approximate(n + 1, maxPoly, lagrange, input));
+    const at2oX = Math.log(Math.log(approximate(n + 2, maxPoly, lagrange, input)));
+    //const mid = Math.abs((at0oX+at1oX)*0.5);
+    const diff = Math.abs(Math.abs((at0oX)-Math.abs(at1oX)));
+    best = diff < best.diff ? {at: n, diff: diff} : best;
+    worst = diff > worst.diff ? {at: n, diff: diff} : worst;
+    //document.write(`<p>at 0.${id} = ${at0oX},ln at 1.${id} = ${at1oX} , ln ln at 2.${id} = ${Math.log(at2oX)} but should be around ${e**n}</p>`);
+    //document.write(`<p>at 0.${id} = ${at0oX},ln at 1.${id} = ${at1oX} but should be around ${e**n}</p>`);
+    ++id;
+  }
+  document.write(`<p> best at ${best.at} with ${best.diff} , worst at ${worst.at} with ${worst.diff}</p>`);
+
+  function evaluateRequirements(lagrange, input) {
+    let id = 1;
+    let best = { at: 0.9, diff: 99};
+    let worst = { at: 0.9, diff: 0};
+    let poly = lagrange.length - 1;
+    if (lagrange.length < 3 && lagrange.length !== input.length) {
+      return undefined;
+    }
+    for (let n = 0.1; n < 0.9; n += 0.1) {
+      const at0oX = approximate(n, poly, lagrange, input);
+      const at1oX = Math.log(approximate(n + 1, poly, lagrange, input));
+      const at2oX = Math.log(Math.log(approximate(n + 2, poly, lagrange, input)));
+      const diff = Math.abs(Math.abs((at0oX)-Math.abs(at1oX)));
+      best = diff < best.diff ? {at: n, diff: diff} : best;
+      worst = diff > worst.diff ? {at: n, diff: diff} : worst;
+      ++id;
+    }
+    return {best: best, worst: worst};
+  }
+  </script>
+  <script>
+    function improveRandom(bestR, check, worst, limit) {
+      let preliminary = {};
+      let index = 0;
+      let count = 0;
+      for (let one of check.in) {
+        if (one === null) {
+          index = count;
+        }
+        ++count;
+      }
+      for (let i = bestR; i < limit; i+=0.01) {
+        check.in[index] = i;
+        check.out[index] = approximate(i, lagrange.length - 1, lagrange, input);
+        const poly = check.in.length - 1;
+        const isCont = isContinous(-1, 2, poly, check.out, check.in);
+        const result = evaluateRequirements(check.out, check.in);
+        if (isCont && result.worst.diff < worst.diff) {
+          worst = result.worst;
+          const copy1 = JSON.parse(JSON.stringify(check.out));
+          const copy2 = JSON.parse(JSON.stringify(check.in));
+          preliminary = { i: i, o: check.out[index], lagrange: copy1, input: copy2, worst: worst};
+        }
+      }
+      return preliminary;
+    }
+  </script>
+  <script>
+  let bestRandom = [{ i: 0.1, o: 1.1, lagrange: lagrange, input: input}];
+  var check = {
+    in: [-1, 0, null, 1, 2],
+    out: [0, 1, null, e, e**e]
+  };
+  bestRandom[0].worst = worst;
+  let preliminary = improveRandom(0.01, check, worst, 0.1);
+  bestRandom[0] = preliminary.i !== undefined ? preliminary : bestRandom[0];
+  worst = bestRandom[0].worst;
+
+  document.write(`<p>best random value at ${bestRandom[0].i} with ${bestRandom[0].o} and worst result ${worst.diff} at ${worst.at}</p>`);
+  lagrange = bestRandom[0].lagrange;
+  input = bestRandom[0].input;
+  console.log(bestRandom[0].lagrange.join());
+  </script>
+  <script>
+    
+    check = {
+      in: [-1, 0, bestRandom[0].i, null, 1, 1 + bestRandom[0].i, 2], 
+      out: [0, 1, bestRandom[0].o, null, e, e**bestRandom[0].o, e**e]
+    };
+    
+    preliminary = improveRandom(bestRandom[0].i, check, worst, 0.2);
+    bestRandom[0] = preliminary.i !== undefined ? preliminary : bestRandom[0];
+    worst = bestRandom[0].worst;
+    
+    for(let one of bestRandom) {
+      document.write(`<p>.. best random value at ${one.i} with ${one.o} and worst result ${worst.diff} at ${worst.at}</p>`);
+     }
+    lagrange = bestRandom[0].lagrange;
+    input = bestRandom[0].input;
+  </script>
+  <script>
+    check = {
+      in: [-1, 0,input[3], null, 1, input[5], 2], 
+      out: [0, 1, lagrange[3], null, e, lagrange[5], e**e]
+    };
+    
+    preliminary = improveRandom(0.01, check, worst, 0.4);
+    bestRandom[0] = preliminary.i !== undefined ? preliminary : bestRandom[0];
+    worst = bestRandom[0].worst;
+
+    for(let one of bestRandom) {
+      document.write(`<p>... best random value at ${one.i} with ${one.o} and worst result ${worst.diff} at ${worst.at}</p>`);
+     }
+    lagrange = bestRandom[0].lagrange;
+    input = bestRandom[0].input;
+  </script>
+  <script>
+    check = {
+      in: [-1, 0, null, input[3], 1, 1+ input[3], 2, 2 + input[3]], 
+      out: [0, 1, null, lagrange[3], e, e ** lagrange[3], e**e, e ** e ** lagrange[3]]
+    };
+    console.log(JSON.stringify(check));
+    preliminary = improveRandom(0.01, check, worst, 0.4);
+    bestRandom[0] = preliminary.i !== undefined ? preliminary : bestRandom[0];
+    worst = bestRandom[0].worst;
+
+    for(let one of bestRandom) {
+      document.write(`<p>- best random value at ${one.i} with ${one.o} and worst result ${worst.diff} at ${worst.at}</p>`);
+     }
+    lagrange = bestRandom[0].lagrange;
+    input = bestRandom[0].input;
+  </script>
+  <script>
+    check = {
+      in: [-1, 0, input[2],  1, null, 2, 2 + input[2]], 
+      out: [0, 1, lagrange[2], e, null, e**e, e ** e ** lagrange[2]]
+    };
+    console.log(JSON.stringify(check));
+    preliminary = improveRandom(0.01, check, worst, 0.6);
+    bestRandom[0] = preliminary.i !== undefined ? preliminary : bestRandom[0];
+    worst = bestRandom[0].worst;
+
+    for(let one of bestRandom) {
+      document.write(`<p>* best random value at ${one.i} with ${one.o} and worst result ${worst.diff} at ${worst.at}</p>`);
+     }
+    lagrange = bestRandom[0].lagrange;
+    input = bestRandom[0].input;
+  </script>
+  <script>
+    maxPoly = input.length - 1;
+    document.write(`<p>red = approximation with ${maxPoly} polynominals , blue = tetration base e (piecewise linear a.)</p>`);    
+    </script>
+    <canvas id="graph" width=320 height=200 style="border:1px solid black;"></canvas>
+    <script>
+    const canvas=document.getElementById("graph");
+    let context = canvas.getContext('2d');
+    const scale = 10;
+    const offset = 10;
+    context.strokeStyle = 'black';
+    context.strokeRect(offset, 0, 1, 200);
+    context.strokeRect(0, 200 - offset, 320, 0);  
+    context.strokeStyle ='red';    
+    for(let i = -1; i < 3; i+=0.01){
+      const y = approximate(i, maxPoly, lagrange, input);  
+      context.strokeRect(offset + i*scale, 200-offset-(y-1)*scale, 1, 1);  
+    }
+        
+    context.strokeStyle ='blue';    
+    for(let i = -1; i < 3; i+=0.1){
+      const y = tet(e, i);  
+      context.strokeRect(offset + i*scale, 200-offset-(y-1)*scale, 1, 1);  
+    }
+  </script>
+  <script>
+    function slog(b, x){  
+    if (x == 0) return -1;
+    if (x == 1) return 0;
+    if (x < 0) return undefined; 
+    if (x > 0 && x < 1) return x - 1; 
+    let rest = x;
+    let count = -1;
+    if (x > 1) {
+      do {
+        rest = Math.log(rest);
+        ++count;
+      }
+      while(rest > 1);
+    }
+    return count + rest;
+  }
+  </script>
+  <script>
+    // calculate values for superlog from approximation
+    const slogValues = [];
+    const slogInput = [];
+    
+    for(let i = -1; i < e; i+=0.04){
+      slogInput.push(approximate(i, maxPoly, lagrange, input));
+      slogValues.push(i);
+    }
+    
+    for(let i = 0; i < e; i+=0.04){
+      const old = approximate(i, maxPoly, lagrange, input);
+      if(old < e) {
+        slogInput.push(e**old);
+        slogValues.push(i + 1);
+      }
+    }
+    
+    const controlValues = [];
+    const controlInput = [];
+    for(let i = 0; i < (e**e); i+=0.2){
+      controlValues.push(slog(e, i));
+      controlInput.push(i);
+    }
+    
+  </script>
+  <script>
+    maxPoly = slogInput.length - 1;
+    document.write(`<p>red = approximation with ${maxPoly} polynominals , green = control approximation based on blue, blue = natural super-logarithm (linear approx.)</p>`);    
+    </script>
+    <canvas id="graph2" width=320 height=200 style="border:1px solid black;"></canvas>
+    <script>
+    const canvas2 = document.getElementById("graph2");
+    let context2 = canvas2.getContext('2d');
+    const scale2 = 100; 
+    const broaden = 20;
+    context2.strokeStyle ='red';
+    let end = 0;
+    for(let i = 0; i < (e**e); i+=0.01){
+      const y = approximate(i, maxPoly, slogValues, slogInput);
+      context2.strokeRect(i*broaden, 200-(y)*scale2, 1, 1);
+      if(end == 0 && y > 2){
+        console.log(`diverges at ${i} with ${y}`);
+        end = i;
+      }
+    }
+    
+    context2.strokeStyle ='green';
+    for(let i = 0; i < (e**e); i+=0.01){
+      const y = approximate(i, controlInput.length - 1, controlValues, controlInput);
+      context2.strokeRect(i*broaden, 200-(y)*scale2, 1, 1);
+    }
+
+    context2.strokeStyle ='blue';    
+    for(let i = 0; i < (e**e); i+=0.1){
+      const y = slog(e, i);  
+      context2.strokeRect(i*broaden, 200-(y)*scale2, 1, 1);  
+    }
+  </script>
+</body>
+</html>
